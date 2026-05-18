@@ -1,0 +1,129 @@
+name: Build APK and Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Create or update a GitHub Release"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Yamera APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Apply CI version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          manifest="app/src/main/AndroidManifest.xml"
+          base_version="$(sed -n 's/.*android:versionName="\([^"]*\)".*/\1/p' "$manifest" | head -n 1)"
+          base_code="$(sed -n 's/.*android:versionCode="\([0-9]*\)".*/\1/p' "$manifest" | head -n 1)"
+          short_sha="${GITHUB_SHA::7}"
+
+          version_name="${base_version}.${GITHUB_RUN_NUMBER}"
+          version_code=$((base_code * 100000 + GITHUB_RUN_NUMBER))
+          tag_name="v${version_name}"
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            tag_name="${GITHUB_REF_NAME}"
+            version_name="${GITHUB_REF_NAME#v}"
+          fi
+
+          sed -i -E "s/android:versionCode=\"[0-9]+\"/android:versionCode=\"${version_code}\"/" "$manifest"
+          sed -i -E "s/android:versionName=\"[^\"]+\"/android:versionName=\"${version_name}\"/" "$manifest"
+
+          echo "version_name=${version_name}" >> "$GITHUB_OUTPUT"
+          echo "version_code=${version_code}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${tag_name}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${short_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Build debug APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon clean assembleDebug
+
+      - name: Package APK
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          apk_name="Yamera-${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.short_sha }}-debug.apk"
+          apk_path="dist/${apk_name}"
+          cp app/build/outputs/apk/debug/app-debug.apk "$apk_path"
+
+          echo "apk_path=${apk_path}" >> "$GITHUB_OUTPUT"
+          echo "apk_name=${apk_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.apk_name }}
+          path: ${{ steps.package.outputs.apk_path }}
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
+        if: github.event_name == 'push' || inputs.release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+          VERSION_CODE: ${{ steps.version.outputs.version_code }}
+          APK_PATH: ${{ steps.package.outputs.apk_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          notes="Automated Yamera APK build.
+
+          Version: ${VERSION_NAME}
+          Version code: ${VERSION_CODE}
+          Commit: ${GITHUB_SHA}
+
+          This is a debug-signed APK from GitHub Actions."
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "$APK_PATH" --clobber
+            gh release edit "$TAG_NAME" \
+              --title "Yamera ${VERSION_NAME}" \
+              --notes "$notes"
+          else
+            gh release create "$TAG_NAME" "$APK_PATH" \
+              --target "$GITHUB_SHA" \
+              --title "Yamera ${VERSION_NAME}" \
+              --notes "$notes"
+          fi
