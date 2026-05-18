@@ -621,11 +621,11 @@ public class MainUI {
             view = main_activity.findViewById(R.id.take_photo);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
             layoutParams.addRule(align_parent_left, 0);
-            layoutParams.addRule(align_parent_right, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
             layoutParams.addRule(align_parent_top, 0);
-            layoutParams.addRule(align_parent_bottom, system_orientation_portrait ? RelativeLayout.TRUE : 0);
-            layoutParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
-            layoutParams.addRule(center_horizontal, system_orientation_portrait ? RelativeLayout.TRUE : 0);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(center_vertical, RelativeLayout.TRUE);
+            layoutParams.addRule(center_horizontal, 0);
             setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
             view.setLayoutParams(layoutParams);
             setViewRotation(view, ui_rotation);
@@ -636,23 +636,19 @@ public class MainUI {
             galleryParams.addRule(align_parent_right, 0);
             galleryParams.addRule(align_parent_top, 0);
             galleryParams.addRule(align_parent_bottom, 0);
-            galleryParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            galleryParams.addRule(center_vertical, 0);
             galleryParams.addRule(center_horizontal, 0);
+            galleryParams.addRule(above, 0);
+            galleryParams.addRule(below, R.id.take_photo);
+            galleryParams.addRule(left_of, 0);
+            galleryParams.addRule(right_of, 0);
+            galleryParams.addRule(align_left, 0);
+            galleryParams.addRule(align_right, 0);
+            galleryParams.addRule(align_top, R.id.take_photo);
+            galleryParams.addRule(align_bottom, R.id.take_photo);
             if(system_orientation_portrait) {
-                galleryParams.addRule(align_top, R.id.take_photo);
-                galleryParams.addRule(align_bottom, R.id.take_photo);
-                galleryParams.addRule(left_of, R.id.take_photo);
-                galleryParams.addRule(right_of, 0);
-                galleryParams.addRule(above, 0);
-                galleryParams.addRule(below, 0);
                 galleryParams.setMargins(0, 0, (int)(40 * scale), 0);
             } else {
-                galleryParams.addRule(align_left, 0);
-                galleryParams.addRule(align_right, 0);
-                galleryParams.addRule(above, R.id.take_photo);
-                galleryParams.addRule(below, 0);
-                galleryParams.addRule(left_of, 0);
-                galleryParams.addRule(right_of, 0);
                 galleryParams.setMargins(0, 0, 0, (int)(40 * scale));
             }
             galleryView.setLayoutParams(galleryParams);
@@ -664,23 +660,19 @@ public class MainUI {
             layoutParams.addRule(align_parent_right, 0);
             layoutParams.addRule(align_parent_top, 0);
             layoutParams.addRule(align_parent_bottom, 0);
-            layoutParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            layoutParams.addRule(center_vertical, 0);
             layoutParams.addRule(center_horizontal, 0);
+            layoutParams.addRule(above, R.id.take_photo);
+            layoutParams.addRule(below, 0);
+            layoutParams.addRule(left_of, 0);
+            layoutParams.addRule(right_of, 0);
+            layoutParams.addRule(align_left, 0);
+            layoutParams.addRule(align_right, 0);
+            layoutParams.addRule(align_top, R.id.take_photo);
+            layoutParams.addRule(align_bottom, R.id.take_photo);
             if(system_orientation_portrait) {
-                layoutParams.addRule(align_top, R.id.take_photo);
-                layoutParams.addRule(align_bottom, R.id.take_photo);
-                layoutParams.addRule(right_of, R.id.take_photo);
-                layoutParams.addRule(left_of, 0);
-                layoutParams.addRule(above, 0);
-                layoutParams.addRule(below, 0);
                 layoutParams.setMargins((int)(40 * scale), 0, 0, 0);
             } else {
-                layoutParams.addRule(align_left, 0);
-                layoutParams.addRule(align_right, 0);
-                layoutParams.addRule(below, R.id.take_photo);
-                layoutParams.addRule(above, 0);
-                layoutParams.addRule(left_of, 0);
-                layoutParams.addRule(right_of, 0);
                 layoutParams.setMargins(0, (int)(40 * scale), 0, 0);
             }
             view.setLayoutParams(layoutParams);
@@ -699,7 +691,7 @@ public class MainUI {
             layoutParams.addRule(left_of, R.id.take_photo);
             layoutParams.addRule(right_of, 0);
             {
-                int margin = (int) (4 * scale + 0.5f); // convert dps to pixels
+                int margin = (int) (12 * scale + 0.5f); // push it a bit further from shutter
                 setMarginsForSystemUI(layoutParams, 0, 0, margin, 0);
             }
             view.setLayoutParams(layoutParams);
