@@ -617,15 +617,72 @@ public class MainUI {
             setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
             view.setLayoutParams(layoutParams);
 
+            // LMC Bottom Bar Setup (Gallery - Shutter - Switch Camera)
             view = main_activity.findViewById(R.id.take_photo);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
             layoutParams.addRule(align_parent_left, 0);
-            layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_right, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_top, 0);
+            layoutParams.addRule(align_parent_bottom, system_orientation_portrait ? RelativeLayout.TRUE : 0);
+            layoutParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            layoutParams.addRule(center_horizontal, system_orientation_portrait ? RelativeLayout.TRUE : 0);
+            setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
+            view.setLayoutParams(layoutParams);
+            setViewRotation(view, ui_rotation);
+
+            View galleryView = main_activity.findViewById(R.id.gallery);
+            RelativeLayout.LayoutParams galleryParams = (RelativeLayout.LayoutParams) galleryView.getLayoutParams();
+            galleryParams.addRule(align_parent_left, 0);
+            galleryParams.addRule(align_parent_right, 0);
+            galleryParams.addRule(align_parent_top, 0);
+            galleryParams.addRule(align_parent_bottom, 0);
+            galleryParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
+            galleryParams.addRule(center_horizontal, 0);
+            if(system_orientation_portrait) {
+                galleryParams.addRule(align_top, R.id.take_photo);
+                galleryParams.addRule(align_bottom, R.id.take_photo);
+                galleryParams.addRule(left_of, R.id.take_photo);
+                galleryParams.addRule(right_of, 0);
+                galleryParams.addRule(above, 0);
+                galleryParams.addRule(below, 0);
+                galleryParams.setMargins(0, 0, (int)(40 * scale), 0);
+            } else {
+                galleryParams.addRule(align_left, 0);
+                galleryParams.addRule(align_right, 0);
+                galleryParams.addRule(above, R.id.take_photo);
+                galleryParams.addRule(below, 0);
+                galleryParams.addRule(left_of, 0);
+                galleryParams.addRule(right_of, 0);
+                galleryParams.setMargins(0, 0, 0, (int)(40 * scale));
+            }
+            galleryView.setLayoutParams(galleryParams);
+            setViewRotation(galleryView, ui_rotation);
+
+            view = main_activity.findViewById(R.id.switch_camera);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, 0);
             layoutParams.addRule(align_parent_top, 0);
             layoutParams.addRule(align_parent_bottom, 0);
-            layoutParams.addRule(center_vertical, RelativeLayout.TRUE);
+            layoutParams.addRule(center_vertical, system_orientation_portrait ? 0 : RelativeLayout.TRUE);
             layoutParams.addRule(center_horizontal, 0);
-            setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
+            if(system_orientation_portrait) {
+                layoutParams.addRule(align_top, R.id.take_photo);
+                layoutParams.addRule(align_bottom, R.id.take_photo);
+                layoutParams.addRule(right_of, R.id.take_photo);
+                layoutParams.addRule(left_of, 0);
+                layoutParams.addRule(above, 0);
+                layoutParams.addRule(below, 0);
+                layoutParams.setMargins((int)(40 * scale), 0, 0, 0);
+            } else {
+                layoutParams.addRule(align_left, 0);
+                layoutParams.addRule(align_right, 0);
+                layoutParams.addRule(below, R.id.take_photo);
+                layoutParams.addRule(above, 0);
+                layoutParams.addRule(left_of, 0);
+                layoutParams.addRule(right_of, 0);
+                layoutParams.setMargins(0, (int)(40 * scale), 0, 0);
+            }
             view.setLayoutParams(layoutParams);
             setViewRotation(view, ui_rotation);
 
@@ -1327,7 +1384,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowExposureLockPreferenceKey, true);
+        return false;
     }
 
     public boolean showWhiteBalanceLockIcon() {
@@ -1338,7 +1395,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowWhiteBalanceLockPreferenceKey, false);
+        return false;
     }
 
     public boolean showCycleRawIcon() {
@@ -1347,36 +1404,36 @@ public class MainUI {
         if( !main_activity.getApplicationInterface().isRawAllowed(main_activity.getApplicationInterface().getPhotoMode()) )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowCycleRawPreferenceKey, false);
+        return false;
     }
 
     public boolean showStoreLocationIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowStoreLocationPreferenceKey, false);
+        return false;
     }
 
     public boolean showTextStampIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowTextStampPreferenceKey, false);
+        return false;
     }
 
     public boolean showStampIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowStampPreferenceKey, false);
+        return false;
     }
 
     public boolean showFocusPeakingIcon() {
         if( !main_activity.supportsPreviewBitmaps() )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowFocusPeakingPreferenceKey, false);
+        return false;
     }
 
     public boolean showAutoLevelIcon() {
         if( !main_activity.supportsAutoStabilise() )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowAutoLevelPreferenceKey, false);
+        return false;
     }
 
     public boolean showCycleFlashIcon() {
@@ -1385,7 +1442,7 @@ public class MainUI {
         if( main_activity.getPreview().isVideo() )
             return false; // no point showing flash icon in video mode, as we only allow flash auto and flash torch, and we don't support torch on the on-screen cycle flash icon
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowCycleFlashPreferenceKey, false);
+        return false;
     }
 
     public boolean showFaceDetectionIcon() {
@@ -1396,7 +1453,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return sharedPreferences.getBoolean(PreferenceKeys.ShowFaceDetectionPreferenceKey, false);
+        return false;
     }
 
     public void setImmersiveMode(final boolean immersive_mode) {

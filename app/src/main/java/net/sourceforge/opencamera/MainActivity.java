@@ -594,6 +594,26 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
             }
         });
 
+        // LMC: Add double tap listener to the controls panel to load XML configurations
+        View controlsPanel = findViewById(R.id.controls_panel);
+        final GestureDetector controlsPanelGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                // Open File Picker for XML
+                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                intent.setType("text/xml");
+                intent.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+                startActivityForResult(android.content.Intent.createChooser(intent, "Select LMC Config (.xml)"), 9999);
+                return true;
+            }
+        });
+        controlsPanel.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return controlsPanelGestureDetector.onTouchEvent(event);
+            }
+        });
+
         if( MyDebug.LOG )
             Log.d(TAG, "onCreate: time after setting long click listeners: " + (System.currentTimeMillis() - debug_time));
 
@@ -5113,6 +5133,19 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         super.onActivityResult(requestCode, resultCode, resultData);
 
         switch( requestCode ) {
+            case 9999:
+                if (resultCode == RESULT_OK && resultData != null) {
+                    android.net.Uri uri = resultData.getData();
+                    try {
+                        java.io.File file = new java.io.File(applicationInterface.getStorageUtils().getFileFromDocumentUriSAF(uri, false).getPath());
+                        LmcConfigManager.importConfig(this, file);
+                        // Refresh UI if necessary
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        preview.showToast(null, "Could not load XML Config");
+                    }
+                }
+                break;
             case CHOOSE_SAVE_FOLDER_SAF_CODE:
                 if( resultCode == RESULT_OK && resultData != null ) {
                     Uri treeUri = resultData.getData();
