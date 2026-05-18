@@ -60,6 +60,17 @@
             />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/quality_profile_badge"
+        android:layout_width="@dimen/quality_profile_badge_width"
+        android:layout_height="@dimen/mode_carousel_height"
+        android:gravity="center"
+        android:textColor="@color/mode_text_active"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        />
     
     <ImageButton
         android:id="@+id/take_photo"

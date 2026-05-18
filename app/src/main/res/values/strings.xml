@@ -181,6 +181,9 @@
     <string name="preference_quality_profile_max_detail">Max detail</string>
     <string name="preference_quality_profile_low_light">Low light</string>
     <string name="preference_quality_profile_fast">Fast capture</string>
+    <string name="quality_profile_badge_max_detail">MAX</string>
+    <string name="quality_profile_badge_low_light">LOW</string>
+    <string name="quality_profile_badge_fast">FAST</string>
     <string name="preference_raw">RAW</string>
     <string name="preference_location">Store location data (Geotagging)</string>
     <string name="preference_location_summary">Store GPS location data in the photos/videos (for photos, location data can only be stored in JPEG and DNG formats)</string>

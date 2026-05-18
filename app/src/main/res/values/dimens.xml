@@ -9,4 +9,5 @@
     <dimen name="controls_panel_size">168dp</dimen>
     <dimen name="mode_carousel_width">184dp</dimen>
     <dimen name="mode_carousel_height">40dp</dimen>
+    <dimen name="quality_profile_badge_width">48dp</dimen>
 </resources>

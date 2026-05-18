@@ -648,6 +648,21 @@ public class MainUI {
             view.setLayoutParams(layoutParams);
             setViewRotation(view, ui_rotation);
 
+            view = main_activity.findViewById(R.id.quality_profile_badge);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, 0);
+            layoutParams.addRule(align_parent_top, 0);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(center_vertical, RelativeLayout.TRUE);
+            layoutParams.addRule(center_horizontal, 0);
+            layoutParams.addRule(above, 0);
+            layoutParams.addRule(below, 0);
+            layoutParams.addRule(left_of, R.id.mode_carousel);
+            layoutParams.addRule(right_of, 0);
+            view.setLayoutParams(layoutParams);
+            setViewRotation(view, ui_rotation);
+
             view = main_activity.findViewById(R.id.switch_camera);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
             layoutParams.addRule(align_parent_left, 0);
@@ -1148,7 +1163,38 @@ public class MainUI {
             photo_mode.setTextColor(is_video ? inactive_color : active_color);
             video_mode.setEnabled(!is_video);
             photo_mode.setEnabled(is_video);
+            updateQualityProfileBadge();
         }
+    }
+
+    private void updateQualityProfileBadge() {
+        TextView badge = main_activity.findViewById(R.id.quality_profile_badge);
+        View mode_carousel = main_activity.findViewById(R.id.mode_carousel);
+        if( mode_carousel.getVisibility() != View.VISIBLE || main_activity.getPreview().isVideo() ) {
+            badge.setVisibility(View.GONE);
+            return;
+        }
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
+        int text_id;
+        switch( quality_profile ) {
+            case "preference_quality_profile_max_detail":
+                text_id = R.string.quality_profile_badge_max_detail;
+                break;
+            case "preference_quality_profile_low_light":
+                text_id = R.string.quality_profile_badge_low_light;
+                break;
+            case "preference_quality_profile_fast":
+                text_id = R.string.quality_profile_badge_fast;
+                break;
+            default:
+                badge.setVisibility(View.GONE);
+                return;
+        }
+        badge.setText(text_id);
+        badge.setContentDescription(main_activity.getResources().getString(R.string.preference_quality_profile) + ": " + badge.getText());
+        badge.setVisibility(View.VISIBLE);
     }
 
     /** Set content description for switch camera button.
@@ -1372,6 +1418,7 @@ public class MainUI {
                 View switchVideoButton = main_activity.findViewById(R.id.switch_video);
                 View controlsPanel = main_activity.findViewById(R.id.controls_panel);
                 View modeCarousel = main_activity.findViewById(R.id.mode_carousel);
+                View qualityProfileBadge = main_activity.findViewById(R.id.quality_profile_badge);
                 View exposureButton = main_activity.findViewById(R.id.exposure);
                 View exposureLockButton = main_activity.findViewById(R.id.exposure_lock);
                 View whiteBalanceLockButton = main_activity.findViewById(R.id.white_balance_lock);
@@ -1397,6 +1444,7 @@ public class MainUI {
                 switchVideoButton.setVisibility(View.GONE);
                 controlsPanel.setVisibility(visibility);
                 modeCarousel.setVisibility(visibility);
+                qualityProfileBadge.setVisibility(View.GONE);
                 if( main_activity.supportsExposureButton() )
                     exposureButton.setVisibility(visibility);
                 if( showExposureLockIcon() )
@@ -1500,6 +1548,7 @@ public class MainUI {
                 View switchVideoButton = main_activity.findViewById(R.id.switch_video);
                 View controlsPanel = main_activity.findViewById(R.id.controls_panel);
                 View modeCarousel = main_activity.findViewById(R.id.mode_carousel);
+                View qualityProfileBadge = main_activity.findViewById(R.id.quality_profile_badge);
                 View exposureButton = main_activity.findViewById(R.id.exposure);
                 View exposureLockButton = main_activity.findViewById(R.id.exposure_lock);
                 View whiteBalanceLockButton = main_activity.findViewById(R.id.white_balance_lock);
@@ -1521,6 +1570,7 @@ public class MainUI {
                 switchVideoButton.setVisibility(View.GONE);
                 controlsPanel.setVisibility(visibility);
                 modeCarousel.setVisibility(visibility);
+                qualityProfileBadge.setVisibility(View.GONE);
                 if( main_activity.supportsExposureButton() )
                     exposureButton.setVisibility(visibility_video); // still allow exposure when recording video
                 if( showExposureLockIcon() )
