@@ -40,6 +40,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -598,6 +599,24 @@ public class MainUI {
 
             // end icon panel
 
+            view = main_activity.findViewById(R.id.controls_panel);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_top, 0);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(center_vertical, 0);
+            layoutParams.addRule(center_horizontal, 0);
+            layoutParams.addRule(above, 0);
+            layoutParams.addRule(below, 0);
+            layoutParams.addRule(left_of, 0);
+            layoutParams.addRule(right_of, 0);
+            int controls_panel_size = main_activity.getResources().getDimensionPixelSize(R.dimen.controls_panel_size);
+            layoutParams.width = system_orientation_portrait ? ViewGroup.LayoutParams.MATCH_PARENT : controls_panel_size;
+            layoutParams.height = system_orientation_portrait ? controls_panel_size : ViewGroup.LayoutParams.MATCH_PARENT;
+            setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
+            view.setLayoutParams(layoutParams);
+
             view = main_activity.findViewById(R.id.take_photo);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
             layoutParams.addRule(align_parent_left, 0);
@@ -607,6 +626,25 @@ public class MainUI {
             layoutParams.addRule(center_vertical, RelativeLayout.TRUE);
             layoutParams.addRule(center_horizontal, 0);
             setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
+            view.setLayoutParams(layoutParams);
+            setViewRotation(view, ui_rotation);
+
+            view = main_activity.findViewById(R.id.mode_carousel);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, 0);
+            layoutParams.addRule(align_parent_top, 0);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(center_vertical, RelativeLayout.TRUE);
+            layoutParams.addRule(center_horizontal, 0);
+            layoutParams.addRule(above, 0);
+            layoutParams.addRule(below, 0);
+            layoutParams.addRule(left_of, R.id.take_photo);
+            layoutParams.addRule(right_of, 0);
+            {
+                int margin = (int) (4 * scale + 0.5f); // convert dps to pixels
+                setMarginsForSystemUI(layoutParams, 0, 0, margin, 0);
+            }
             view.setLayoutParams(layoutParams);
             setViewRotation(view, ui_rotation);
 
@@ -1100,6 +1138,16 @@ public class MainUI {
             resource = main_activity.getPreview().isVideo() ? R.drawable.take_photo : R.drawable.take_video;
             view.setImageResource(resource);
             view.setTag(resource); // for testing
+
+            TextView video_mode = main_activity.findViewById(R.id.mode_video);
+            TextView photo_mode = main_activity.findViewById(R.id.mode_photo);
+            int active_color = main_activity.getResources().getColor(R.color.mode_text_active);
+            int inactive_color = main_activity.getResources().getColor(R.color.mode_text_inactive);
+            boolean is_video = main_activity.getPreview().isVideo();
+            video_mode.setTextColor(is_video ? active_color : inactive_color);
+            photo_mode.setTextColor(is_video ? inactive_color : active_color);
+            video_mode.setEnabled(!is_video);
+            photo_mode.setEnabled(is_video);
         }
     }
 

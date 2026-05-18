@@ -3,7 +3,7 @@
     android:shape="oval">
     <solid android:color="@color/shutter_icon"/>
     <stroke
-        android:width="5dp"
-        android:color="#FFFFFF"
+        android:width="6dp"
+        android:color="#33000000"
         />
 </shape>

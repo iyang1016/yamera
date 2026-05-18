@@ -633,7 +633,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
     private int getSaveImageQualityPref() {
         if( MyDebug.LOG )
             Log.d(TAG, "getSaveImageQualityPref");
-        String image_quality_s = sharedPreferences.getString(PreferenceKeys.QualityPreferenceKey, "90");
+        String image_quality_s = sharedPreferences.getString(PreferenceKeys.QualityPreferenceKey, "95");
         int image_quality;
         try {
             image_quality = Integer.parseInt(image_quality_s);
@@ -641,7 +641,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         catch(NumberFormatException exception) {
             if( MyDebug.LOG )
                 Log.e(TAG, "image_quality_s invalid format: " + image_quality_s);
-            image_quality = 90;
+            image_quality = 95;
         }
         if( isRawOnly() ) {
             // if raw only mode, we can set a lower quality for the JPEG, as it isn't going to be saved - only used for
