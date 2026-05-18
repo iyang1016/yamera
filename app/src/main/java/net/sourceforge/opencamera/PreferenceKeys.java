@@ -124,6 +124,7 @@ public class PreferenceKeys {
     public static final String AudioNoiseControlSensitivityPreferenceKey = "preference_audio_noise_control_sensitivity";
 
     public static final String QualityPreferenceKey = "preference_quality";
+    public static final String QualityProfilePreferenceKey = "preference_quality_profile";
 
     public static final String AutoStabilisePreferenceKey = "preference_auto_stabilise";
 

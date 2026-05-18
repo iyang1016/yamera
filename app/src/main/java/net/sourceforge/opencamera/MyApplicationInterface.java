@@ -643,6 +643,20 @@ public class MyApplicationInterface extends BasicApplicationInterface {
                 Log.e(TAG, "image_quality_s invalid format: " + image_quality_s);
             image_quality = 95;
         }
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
+        switch( quality_profile ) {
+            case "preference_quality_profile_max_detail":
+                image_quality = 100;
+                break;
+            case "preference_quality_profile_fast":
+                image_quality = Math.min(image_quality, 90);
+                break;
+            case "preference_quality_profile_low_light":
+                image_quality = Math.max(image_quality, 95);
+                break;
+            default:
+                break;
+        }
         if( isRawOnly() ) {
             // if raw only mode, we can set a lower quality for the JPEG, as it isn't going to be saved - only used for
             // the thumbnail and pause preview option

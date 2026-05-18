@@ -115,6 +115,18 @@
         <item>0</item>
         <item>180</item>
     </string-array>
+    <string-array name="preference_quality_profile_entries">
+        <item>@string/preference_quality_profile_auto</item>
+        <item>@string/preference_quality_profile_max_detail</item>
+        <item>@string/preference_quality_profile_low_light</item>
+        <item>@string/preference_quality_profile_fast</item>
+    </string-array>
+    <string-array name="preference_quality_profile_values">
+        <item>preference_quality_profile_auto</item>
+        <item>preference_quality_profile_max_detail</item>
+        <item>preference_quality_profile_low_light</item>
+        <item>preference_quality_profile_fast</item>
+    </string-array>
     <string-array name="preference_angle_highlight_color_entries"> <!-- n.b., also used for focus peaking colors -->
         <item>Red</item>
         <item>Green</item>

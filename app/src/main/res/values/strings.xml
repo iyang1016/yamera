@@ -175,6 +175,12 @@
     <string name="preference_resolution">Camera resolution</string>
     <string name="preference_quality">Image quality</string>
     <string name="preference_quality_summary">Set the image quality of saved JPEG or WebP photo images (default value is 95%%). Has no effect for PNG image format.\n%s</string> <!-- '%' is encoded as '%%' - a single % can crash devices, and this isn't picked up by Android Lint! -->
+    <string name="preference_quality_profile">Quality profile</string>
+    <string name="preference_quality_profile_summary">Select how Yamera balances output detail and capture speed.\n%s</string>
+    <string name="preference_quality_profile_auto">Auto quality</string>
+    <string name="preference_quality_profile_max_detail">Max detail</string>
+    <string name="preference_quality_profile_low_light">Low light</string>
+    <string name="preference_quality_profile_fast">Fast capture</string>
     <string name="preference_raw">RAW</string>
     <string name="preference_location">Store location data (Geotagging)</string>
     <string name="preference_location_summary">Store GPS location data in the photos/videos (for photos, location data can only be stored in JPEG and DNG formats)</string>
