@@ -42,6 +42,27 @@ public class UnitTest {
     private static final String TAG = "UnitTest";
 
     @Test
+    public void testQualityProfileImageQuality() {
+        assertEquals(95, MyApplicationInterface.getSaveImageQualityForProfile(95, "preference_quality_profile_auto"));
+        assertEquals(100, MyApplicationInterface.getSaveImageQualityForProfile(95, "preference_quality_profile_max_detail"));
+        assertEquals(95, MyApplicationInterface.getSaveImageQualityForProfile(90, "preference_quality_profile_low_light"));
+        assertEquals(97, MyApplicationInterface.getSaveImageQualityForProfile(97, "preference_quality_profile_low_light"));
+        assertEquals(90, MyApplicationInterface.getSaveImageQualityForProfile(95, "preference_quality_profile_fast"));
+        assertEquals(85, MyApplicationInterface.getSaveImageQualityForProfile(85, "preference_quality_profile_fast"));
+    }
+
+    @Test
+    public void testQualityProfileFocusPolicy() {
+        assertTrue(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_auto", "preference_photo_optimise_focus_latency", true));
+        assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_auto", "preference_photo_optimise_focus_quality", true));
+        assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_auto", "preference_photo_optimise_focus_latency", false));
+        assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_max_detail", "preference_photo_optimise_focus_latency", true));
+        assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_low_light", "preference_photo_optimise_focus_latency", true));
+        assertTrue(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_fast", "preference_photo_optimise_focus_quality", true));
+        assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_fast", "preference_photo_optimise_focus_quality", false));
+    }
+
+    @Test
     public void testLocationToDMS() {
         Log.d(TAG, "testLocationToDMS");
 

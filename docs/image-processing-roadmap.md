@@ -44,6 +44,7 @@ Improve still image quality while keeping capture predictable. There is no liter
 - Camera2 default is enabled when the device supports it.
 - JPEG/WebP save quality defaults to 95.
 - `preference_quality_profile` is available in Photo settings, with Auto Quality, Max Detail, Low Light, and Fast Capture profiles.
+- Quality profiles currently adjust saved image quality and continuous-focus latency policy.
 - Existing Open Camera photo modes already include HDR, DRO, NoiseReduction, and Camera2 extension modes where available.
 - CameraController2 already probes JPEG_R support on Android 14+ devices.
 

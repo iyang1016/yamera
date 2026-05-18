@@ -630,6 +630,34 @@ public class MyApplicationInterface extends BasicApplicationInterface {
      *  resultant JPEG before resaving. This method returns the image quality setting to be used for
      *  saving the final image (as specified by the user).
      */
+    public static int getSaveImageQualityForProfile(int image_quality, String quality_profile) {
+        switch( quality_profile ) {
+            case "preference_quality_profile_max_detail":
+                return 100;
+            case "preference_quality_profile_fast":
+                return Math.min(image_quality, 90);
+            case "preference_quality_profile_low_light":
+                return Math.max(image_quality, 95);
+            default:
+                return image_quality;
+        }
+    }
+
+    public static boolean optimiseFocusForLatencyForProfile(String quality_profile, String optimise_focus_pref, boolean supports_optimise_focus_latency) {
+        if( !supports_optimise_focus_latency ) {
+            return false;
+        }
+        switch( quality_profile ) {
+            case "preference_quality_profile_max_detail":
+            case "preference_quality_profile_low_light":
+                return false;
+            case "preference_quality_profile_fast":
+                return true;
+            default:
+                return optimise_focus_pref.equals("preference_photo_optimise_focus_latency");
+        }
+    }
+
     private int getSaveImageQualityPref() {
         if( MyDebug.LOG )
             Log.d(TAG, "getSaveImageQualityPref");
@@ -644,19 +672,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
             image_quality = 95;
         }
         String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
-        switch( quality_profile ) {
-            case "preference_quality_profile_max_detail":
-                image_quality = 100;
-                break;
-            case "preference_quality_profile_fast":
-                image_quality = Math.min(image_quality, 90);
-                break;
-            case "preference_quality_profile_low_light":
-                image_quality = Math.max(image_quality, 95);
-                break;
-            default:
-                break;
-        }
+        image_quality = getSaveImageQualityForProfile(image_quality, quality_profile);
         if( isRawOnly() ) {
             // if raw only mode, we can set a lower quality for the JPEG, as it isn't going to be saved - only used for
             // the thumbnail and pause preview option
@@ -1928,8 +1944,9 @@ public class MyApplicationInterface extends BasicApplicationInterface {
 
     @Override
     public boolean optimiseFocusForLatency() {
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
         String pref = sharedPreferences.getString(PreferenceKeys.OptimiseFocusPreferenceKey, "preference_photo_optimise_focus_latency");
-        return pref.equals("preference_photo_optimise_focus_latency") && main_activity.supportsOptimiseFocusLatency();
+        return optimiseFocusForLatencyForProfile(quality_profile, pref, main_activity.supportsOptimiseFocusLatency());
     }
 
     @Override

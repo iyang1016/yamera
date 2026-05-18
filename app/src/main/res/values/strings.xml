@@ -176,7 +176,7 @@
     <string name="preference_quality">Image quality</string>
     <string name="preference_quality_summary">Set the image quality of saved JPEG or WebP photo images (default value is 95%%). Has no effect for PNG image format.\n%s</string> <!-- '%' is encoded as '%%' - a single % can crash devices, and this isn't picked up by Android Lint! -->
     <string name="preference_quality_profile">Quality profile</string>
-    <string name="preference_quality_profile_summary">Select how Yamera balances output detail and capture speed.\n%s</string>
+    <string name="preference_quality_profile_summary">Select how Yamera balances output detail, focus policy, and capture speed.\n%s</string>
     <string name="preference_quality_profile_auto">Auto quality</string>
     <string name="preference_quality_profile_max_detail">Max detail</string>
     <string name="preference_quality_profile_low_light">Low light</string>
