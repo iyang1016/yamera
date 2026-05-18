@@ -37,6 +37,9 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses >/dev/null
