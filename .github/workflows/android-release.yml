@@ -124,7 +124,7 @@ jobs:
           fi
 
           {
-            echo "changelog<<'CHANGELOG'"
+            echo "changelog<<CHANGELOG"
             echo "## Changelog"
             echo
             if [[ -n "$previous_tag" ]]; then
