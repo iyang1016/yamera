@@ -1370,6 +1370,8 @@ public class MainUI {
                 View switchCameraButton = main_activity.findViewById(R.id.switch_camera);
                 View switchMultiCameraButton = main_activity.findViewById(R.id.switch_multi_camera);
                 View switchVideoButton = main_activity.findViewById(R.id.switch_video);
+                View controlsPanel = main_activity.findViewById(R.id.controls_panel);
+                View modeCarousel = main_activity.findViewById(R.id.mode_carousel);
                 View exposureButton = main_activity.findViewById(R.id.exposure);
                 View exposureLockButton = main_activity.findViewById(R.id.exposure_lock);
                 View whiteBalanceLockButton = main_activity.findViewById(R.id.white_balance_lock);
@@ -1392,7 +1394,9 @@ public class MainUI {
                     switchCameraButton.setVisibility(visibility);
                 if( main_activity.showSwitchMultiCamIcon() )
                     switchMultiCameraButton.setVisibility(visibility);
-                switchVideoButton.setVisibility(visibility);
+                switchVideoButton.setVisibility(View.GONE);
+                controlsPanel.setVisibility(visibility);
+                modeCarousel.setVisibility(visibility);
                 if( main_activity.supportsExposureButton() )
                     exposureButton.setVisibility(visibility);
                 if( showExposureLockIcon() )
@@ -1494,6 +1498,8 @@ public class MainUI {
                 View switchCameraButton = main_activity.findViewById(R.id.switch_camera);
                 View switchMultiCameraButton = main_activity.findViewById(R.id.switch_multi_camera);
                 View switchVideoButton = main_activity.findViewById(R.id.switch_video);
+                View controlsPanel = main_activity.findViewById(R.id.controls_panel);
+                View modeCarousel = main_activity.findViewById(R.id.mode_carousel);
                 View exposureButton = main_activity.findViewById(R.id.exposure);
                 View exposureLockButton = main_activity.findViewById(R.id.exposure_lock);
                 View whiteBalanceLockButton = main_activity.findViewById(R.id.white_balance_lock);
@@ -1512,7 +1518,9 @@ public class MainUI {
                     switchCameraButton.setVisibility(visibility);
                 if( main_activity.showSwitchMultiCamIcon() )
                     switchMultiCameraButton.setVisibility(visibility);
-                switchVideoButton.setVisibility(visibility);
+                switchVideoButton.setVisibility(View.GONE);
+                controlsPanel.setVisibility(visibility);
+                modeCarousel.setVisibility(visibility);
                 if( main_activity.supportsExposureButton() )
                     exposureButton.setVisibility(visibility_video); // still allow exposure when recording video
                 if( showExposureLockIcon() )

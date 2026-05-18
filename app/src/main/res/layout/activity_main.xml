@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/controls_panel_size"
         android:background="@color/controls_panel_background"
+        android:visibility="invisible"
         />
 
     <LinearLayout
@@ -25,6 +26,7 @@
         android:layout_height="@dimen/mode_carousel_height"
         android:gravity="center"
         android:orientation="horizontal"
+        android:visibility="invisible"
         >
 
         <TextView
@@ -79,7 +81,7 @@
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/switch_to_front_camera"
-        app:srcCompat="@drawable/switch_camera"
+        app:srcCompat="@drawable/ic_yamera_camera_switch_24"
         android:stateListAnimator="@animator/button_animation"
         android:onClick="clickedSwitchCamera"
         android:background="@drawable/circle_background"
@@ -146,6 +148,7 @@
         android:alpha="0.61"
         android:onClick="clickedSwitchVideo"
         android:background="@null"
+        android:visibility="gone"
         />
 
     <!-- need large padding than pause_video, to reflect that pause_video icon has padding built into the png image -->
@@ -219,7 +222,7 @@
         android:padding="0dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/gallery"
-        app:srcCompat="@drawable/baseline_photo_library_white_48"
+        app:srcCompat="@drawable/ic_yamera_gallery_24"
         android:background="#00000000"
         android:backgroundTint="@color/icons_background_tint"
         android:backgroundTintMode="src_in"
@@ -233,7 +236,7 @@
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/action_settings"
-        app:srcCompat="@drawable/settings"
+        app:srcCompat="@drawable/ic_yamera_settings_24"
         android:background="@drawable/control_button_background"
         android:backgroundTint="@color/icons_background_tint"
         android:backgroundTintMode="src_in"
@@ -247,7 +250,7 @@
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/action_popup"
-        app:srcCompat="@drawable/popup"
+        app:srcCompat="@drawable/ic_yamera_tune_24"
         android:background="@drawable/control_button_background"
         android:backgroundTint="@color/icons_background_tint"
         android:backgroundTintMode="src_in"

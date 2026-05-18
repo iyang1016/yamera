@@ -4639,7 +4639,7 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
 	    /*if( MyDebug.LOG )
 			Log.d(TAG, "padding: " + bottom);*/
         galleryButton.setImageBitmap(null);
-        galleryButton.setImageResource(R.drawable.baseline_photo_library_white_48);
+        galleryButton.setImageResource(R.drawable.ic_yamera_gallery_24);
         // workaround for setImageResource also resetting padding, Android bug
         galleryButton.setPadding(left, top, right, bottom);
         gallery_bitmap = null;
