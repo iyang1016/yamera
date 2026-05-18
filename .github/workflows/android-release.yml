@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -104,6 +106,42 @@ jobs:
           path: ${{ steps.package.outputs.apk_path }}
           if-no-files-found: error
 
+      - name: Generate changelog
+        id: changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          current_tag="${{ steps.version.outputs.tag_name }}"
+          previous_tag="$(git tag --list 'v*' --sort=-version:refname | grep -v "^${current_tag}$" | head -n 1 || true)"
+
+          if [[ -n "$previous_tag" ]]; then
+            range="${previous_tag}..HEAD"
+            compare_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${previous_tag}...${current_tag}"
+          else
+            range="HEAD"
+            compare_url=""
+          fi
+
+          {
+            echo "changelog<<'CHANGELOG'"
+            echo "## Changelog"
+            echo
+            if [[ -n "$previous_tag" ]]; then
+              echo "Changes since ${previous_tag}:"
+            else
+              echo "Initial automated release changelog:"
+            fi
+            echo
+            git log --no-merges --pretty=format:'- %s (`%h`)' "$range"
+            echo
+            if [[ -n "$compare_url" ]]; then
+              echo
+              echo "Compare: ${compare_url}"
+            fi
+            echo "CHANGELOG"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create or update GitHub Release
         if: github.event_name == 'push' || inputs.release
         env:
@@ -111,6 +149,7 @@ jobs:
           TAG_NAME: ${{ steps.version.outputs.tag_name }}
           VERSION_NAME: ${{ steps.version.outputs.version_name }}
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
           APK_PATH: ${{ steps.package.outputs.apk_path }}
         shell: bash
         run: |
@@ -122,7 +161,9 @@ jobs:
           Version code: ${VERSION_CODE}
           Commit: ${GITHUB_SHA}
 
-          This is a debug-signed APK from GitHub Actions."
+          This is a debug-signed APK from GitHub Actions.
+
+          ${CHANGELOG}"
 
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             gh release upload "$TAG_NAME" "$APK_PATH" --clobber
