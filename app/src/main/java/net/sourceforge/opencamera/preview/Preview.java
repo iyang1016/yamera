@@ -898,6 +898,24 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
     private class DoubleTapListener extends GestureDetector.SimpleOnGestureListener {
         @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (e1 == null || e2 == null) return false;
+            float xdist = e1.getX() - e2.getX();
+            float ydist = e1.getY() - e2.getY();
+            // Check if it's a horizontal swipe
+            if (Math.abs(xdist) > Math.abs(ydist)) {
+                // If the user swiped horizontally, let's toggle photo/video mode for now
+                // A left swipe (e1 > e2) or right swipe (e1 < e2) will just toggle it since there are only 2 main modes right now
+                if (Math.abs(xdist) > 100 && Math.abs(velocityX) > 100) {
+                    // Trigger mode switch in MainActivity
+                    ((net.sourceforge.opencamera.MainActivity) getContext()).clickedSwitchVideo(null);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
             if( MyDebug.LOG )
                 Log.d(TAG, "onSingleTapConfirmed");
