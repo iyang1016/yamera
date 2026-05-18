@@ -2811,7 +2811,7 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
     public void clickedQualityProfileBadge(View view) {
         if( MyDebug.LOG )
             Log.d(TAG, "clickedQualityProfileBadge");
-        KeyguardUtils.requireKeyguard(this, this::openSettings);
+        KeyguardUtils.requireKeyguard(this, this::openPhotoSettings);
     }
 
     public boolean popupIsOpen() {
@@ -3042,6 +3042,14 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
     }
 
     public void openSettings() {
+        openSettings(null);
+    }
+
+    private void openPhotoSettings() {
+        openSettings(PreferenceSubPhoto.class.getName());
+    }
+
+    private void openSettings(String initial_fragment) {
         if( MyDebug.LOG )
             Log.d(TAG, "openSettings");
         closePopup(); // important to close the popup to avoid confusing with back button callbacks
@@ -3300,7 +3308,7 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
 
         showPreview(false);
         setWindowFlagsForSettings(); // important to do after passing camera info into bundle, since this will close the camera
-        MyPreferenceFragment fragment = new MyPreferenceFragment();
+        Fragment fragment = initial_fragment == null ? new MyPreferenceFragment() : Fragment.instantiate(this, initial_fragment, bundle);
         fragment.setArguments(bundle);
         // use commitAllowingStateLoss() instead of commit(), does to "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState" crash seen on Google Play
         // see http://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
