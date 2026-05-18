@@ -1193,7 +1193,6 @@ public class MainUI {
                 return;
         }
         badge.setText(text_id);
-        badge.setContentDescription(main_activity.getResources().getString(R.string.preference_quality_profile) + ": " + badge.getText());
         badge.setVisibility(View.VISIBLE);
     }
 

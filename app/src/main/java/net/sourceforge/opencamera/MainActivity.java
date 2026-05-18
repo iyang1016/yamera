@@ -2808,6 +2808,12 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         KeyguardUtils.requireKeyguard(this, this::openSettings);
     }
 
+    public void clickedQualityProfileBadge(View view) {
+        if( MyDebug.LOG )
+            Log.d(TAG, "clickedQualityProfileBadge");
+        KeyguardUtils.requireKeyguard(this, this::openSettings);
+    }
+
     public boolean popupIsOpen() {
         return mainUI.popupIsOpen();
     }
