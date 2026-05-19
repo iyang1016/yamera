@@ -7589,7 +7589,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         }
         if( mPreview.getSupportedNoiseReductionModes() != null ) {
             Integer new_noise_reduction_mode = previewBuilder.get(CaptureRequest.NOISE_REDUCTION_MODE);
-            assertEquals(CameraMetadata.NOISE_REDUCTION_MODE_FAST, new_noise_reduction_mode.intValue());
+            assertEquals(CameraMetadata.NOISE_REDUCTION_MODE_HIGH_QUALITY, new_noise_reduction_mode.intValue());
         }
 
         subTestTakeVideo(false, false, true, false, null, 5000, false, 0);
