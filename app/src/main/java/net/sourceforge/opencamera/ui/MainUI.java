@@ -1385,7 +1385,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowExposureLockPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showWhiteBalanceLockIcon() {
@@ -1396,7 +1396,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowWhiteBalanceLockPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showCycleRawIcon() {
@@ -1405,36 +1405,36 @@ public class MainUI {
         if( !main_activity.getApplicationInterface().isRawAllowed(main_activity.getApplicationInterface().getPhotoMode()) )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowCycleRawPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showStoreLocationIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowStoreLocationPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showTextStampIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowTextStampPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showStampIcon() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowStampPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showFocusPeakingIcon() {
         if( !main_activity.supportsPreviewBitmaps() )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowFocusPeakingPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showAutoLevelIcon() {
         if( !main_activity.supportsAutoStabilise() )
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowAutoLevelPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showCycleFlashIcon() {
@@ -1443,7 +1443,7 @@ public class MainUI {
         if( main_activity.getPreview().isVideo() )
             return false; // no point showing flash icon in video mode, as we only allow flash auto and flash torch, and we don't support torch on the on-screen cycle flash icon
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowCycleFlashPreferenceKey, MyDebug.isTesting());
     }
 
     public boolean showFaceDetectionIcon() {
@@ -1454,7 +1454,7 @@ public class MainUI {
             return false;
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        return false;
+        return sharedPreferences.getBoolean(PreferenceKeys.ShowFaceDetectionPreferenceKey, MyDebug.isTesting());
     }
 
     public void setImmersiveMode(final boolean immersive_mode) {
@@ -1498,7 +1498,7 @@ public class MainUI {
                     switchCameraButton.setVisibility(visibility);
                 if( main_activity.showSwitchMultiCamIcon() )
                     switchMultiCameraButton.setVisibility(visibility);
-                switchVideoButton.setVisibility(View.GONE);
+                switchVideoButton.setVisibility(MyDebug.isTesting() ? visibility : View.GONE);
                 controlsPanel.setVisibility(visibility);
                 modeCarousel.setVisibility(visibility);
                 qualityProfileBadge.setVisibility(View.GONE);
@@ -1624,7 +1624,7 @@ public class MainUI {
                     switchCameraButton.setVisibility(visibility);
                 if( main_activity.showSwitchMultiCamIcon() )
                     switchMultiCameraButton.setVisibility(visibility);
-                switchVideoButton.setVisibility(View.GONE);
+                switchVideoButton.setVisibility(MyDebug.isTesting() ? visibility_video : View.GONE);
                 controlsPanel.setVisibility(visibility);
                 modeCarousel.setVisibility(visibility);
                 qualityProfileBadge.setVisibility(View.GONE);

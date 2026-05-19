@@ -10,6 +10,19 @@ public class MyDebug {
      */
     public static final boolean LOG = false;
 
+    private static Boolean is_testing = null;
+    public static boolean isTesting() {
+        if( is_testing == null ) {
+            try {
+                Class.forName("net.sourceforge.opencamera.test.MainActivityTest");
+                is_testing = true;
+            } catch (ClassNotFoundException e) {
+                is_testing = false;
+            }
+        }
+        return is_testing;
+    }
+
     /** Wrapper to print exceptions, should use instead of e.printStackTrace().
      */
     public static void logStackTrace(String tag, String msg, Throwable tr) {

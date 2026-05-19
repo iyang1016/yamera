@@ -66,8 +66,4 @@ java {
     }
 }
 
-tasks.configureEach { task ->
-    if (task.name.toLowerCase().contains("test")) {
-        task.enabled = false
-    }
-}
+
