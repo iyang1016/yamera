@@ -11,6 +11,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
@@ -28,6 +29,25 @@ public class LmcConfigManager {
             return false;
         }
 
+        try {
+            FileInputStream fis = new FileInputStream(xmlFile);
+            boolean result = importConfig(context, fis, xmlFile.getName());
+            fis.close();
+            return result;
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening config file", e);
+            Toast.makeText(context, "Error reading XML config.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    public static boolean importConfig(Context context, InputStream inputStream, String configName) {
+        if (inputStream == null) {
+            Log.e(TAG, "InputStream is null.");
+            Toast.makeText(context, "Failed to load config. Invalid stream.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -36,8 +56,7 @@ public class LmcConfigManager {
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
 
-            FileInputStream fis = new FileInputStream(xmlFile);
-            xpp.setInput(new InputStreamReader(fis));
+            xpp.setInput(new InputStreamReader(inputStream));
 
             int eventType = xpp.getEventType();
             String currentTag = null;
@@ -74,8 +93,7 @@ public class LmcConfigManager {
             }
 
             editor.apply();
-            fis.close();
-            Toast.makeText(context, "Config loaded: " + xmlFile.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Config loaded: " + (configName != null ? configName : "XML Config"), Toast.LENGTH_SHORT).show();
             return true;
 
         } catch (Exception e) {

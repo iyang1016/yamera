@@ -2800,6 +2800,18 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         }
     }
 
+    public void clickedModePhoto(View view) {
+        if (preview.isVideo()) {
+            clickedSwitchVideo(null);
+        }
+    }
+
+    public void clickedModeVideo(View view) {
+        if (!preview.isVideo()) {
+            clickedSwitchVideo(null);
+        }
+    }
+
     public void clickedWhiteBalanceLock(View view) {
         if( MyDebug.LOG )
             Log.d(TAG, "clickedWhiteBalanceLock");
@@ -5137,9 +5149,28 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
                 if (resultCode == RESULT_OK && resultData != null) {
                     android.net.Uri uri = resultData.getData();
                     try {
-                        java.io.File file = new java.io.File(applicationInterface.getStorageUtils().getFileFromDocumentUriSAF(uri, false).getPath());
-                        LmcConfigManager.importConfig(this, file);
-                        // Refresh UI if necessary
+                        java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+                        if (inputStream != null) {
+                            String displayName = null;
+                            try (android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                                if (cursor != null && cursor.moveToFirst()) {
+                                    int nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
+                                    if (nameIndex != -1) {
+                                        displayName = cursor.getString(nameIndex);
+                                    }
+                                }
+                            } catch (Exception ignored) {}
+                            if (displayName == null) {
+                                displayName = uri.getLastPathSegment();
+                            }
+                            boolean success = LmcConfigManager.importConfig(this, inputStream, displayName);
+                            inputStream.close();
+                            if (success) {
+                                this.recreate();
+                            }
+                        } else {
+                            preview.showToast(null, "Could not open config file");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         preview.showToast(null, "Could not load XML Config");

@@ -456,7 +456,8 @@ public class MainUI {
                 setViewRotation(view, ui_rotation);
             }
             else {
-                buttons_permanent.add(main_activity.findViewById(R.id.gallery));
+                // LMC: Gallery is placed in the bottom bar, not on the top icon panel
+                // buttons_permanent.add(main_activity.findViewById(R.id.gallery));
             }
             buttons_permanent.add(main_activity.findViewById(R.id.settings));
             buttons_permanent.add(main_activity.findViewById(R.id.popup));
@@ -712,7 +713,9 @@ public class MainUI {
             view.setLayoutParams(layoutParams);
             setViewRotation(view, ui_rotation);
 
-            view = main_activity.findViewById(R.id.switch_camera);
+            // LMC: switch_camera is already laid out next to take_photo inside the bottom bar setup block.
+            // Do not override it here with the default layout params.
+            /*view = main_activity.findViewById(R.id.switch_camera);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
             layoutParams.addRule(align_parent_left, 0);
             layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
@@ -724,7 +727,7 @@ public class MainUI {
             layoutParams.addRule(ui_independent_right_of, 0);
             setMarginsForSystemUI(layoutParams, 0, 0, navigation_gap, 0);
             view.setLayoutParams(layoutParams);
-            setViewRotation(view, ui_rotation);
+            setViewRotation(view, ui_rotation);*/
 
             view = main_activity.findViewById(R.id.switch_multi_camera);
             layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
@@ -1210,8 +1213,10 @@ public class MainUI {
             boolean is_video = main_activity.getPreview().isVideo();
             video_mode.setTextColor(is_video ? active_color : inactive_color);
             photo_mode.setTextColor(is_video ? inactive_color : active_color);
-            video_mode.setEnabled(!is_video);
-            photo_mode.setEnabled(is_video);
+            video_mode.setEnabled(true);
+            photo_mode.setEnabled(true);
+            video_mode.setTypeface(null, is_video ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+            photo_mode.setTypeface(null, is_video ? android.graphics.Typeface.NORMAL : android.graphics.Typeface.BOLD);
             updateQualityProfileBadge();
         }
     }

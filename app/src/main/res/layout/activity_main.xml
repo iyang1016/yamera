@@ -40,7 +40,7 @@
             android:textColor="@color/mode_text_inactive"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:onClick="clickedSwitchVideo"
+            android:onClick="clickedModeVideo"
             android:clickable="true"
             />
 
@@ -55,7 +55,7 @@
             android:textColor="@color/mode_text_active"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:onClick="clickedSwitchVideo"
+            android:onClick="clickedModePhoto"
             android:clickable="true"
             />
 
