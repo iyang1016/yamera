@@ -44,9 +44,27 @@ Improve still image quality while keeping capture predictable. There is no liter
 - Camera2 default is enabled when the device supports it.
 - JPEG/WebP save quality defaults to 95.
 - `preference_quality_profile` is available in Photo settings, with Auto Quality, Max Detail, Low Light, and Fast Capture profiles.
-- Quality profiles currently adjust saved image quality and continuous-focus latency policy.
+- Quality profiles adjust saved image quality and continuous-focus latency policy.
+- When the saved photo mode is Standard, `QualityPipelinePlanner` maps the active quality profile to the best supported capture pipeline:
+  - Auto Quality uses current Camera2 ISO/exposure metadata when available; dark scenes prefer Camera Extension Night, low-light NoiseReduction, DRO, and Standard, while normal scenes prefer Camera Extension Auto and Standard.
+  - Max Detail prefers Camera Extension Auto, then NoiseReduction, HDR, DRO, and Standard.
+  - Low Light prefers Camera Extension Night, then low-light NoiseReduction, DRO, and Standard.
+  - Fast keeps Standard to preserve latency.
+- RAW-only capture stays Standard so the profile planner does not silently disable RAW output.
+- Video mode stays Standard so still-photo profile automation does not interfere with video setup.
+- The viewfinder quality badge now displays both profile and active pipeline, such as `MAX NR`, `LOW NIGHT`, `FAST STD`, or `AUTO X-AUTO`.
+- The mode switch and quality badge use compact glass-style capsule backgrounds to move the camera UI closer to LMC/GCam-style controls without changing the core workflow.
+- Automatic slow profile choices show hold-steady capture feedback for modes such as HDR and normal NoiseReduction.
+- Ultra HDR/JPEG_R selection is now routed through a tested planner method and is disabled for pipelines that post-process the JPEG or use camera extensions. When active, the quality badge shows `UHDR`.
+- HDR/DRO processing settings are profile-aware:
+  - Max Detail uses ACES tonemapping with always-on local contrast enhancement.
+  - Low Light uses default tonemapping with local contrast enhancement off to reduce noise amplification.
+  - Fast uses clamp tonemapping with local contrast enhancement off when a slow processing mode is manually selected.
+  - Auto keeps user HDR processing settings unless the ISO/exposure scene hint indicates low light, then it follows the Low Light noise-control path.
+- Debug builds log the selected quality profile, planner reason, Ultra HDR state, effective HDR/DRO processing reason, process type, image count, format, JPEG quality, Camera2/extension path, ISO, exposure time, and total save time.
 - Existing Open Camera photo modes already include HDR, DRO, NoiseReduction, and Camera2 extension modes where available.
 - CameraController2 already probes JPEG_R support on Android 14+ devices.
+- Unit coverage checks profile image quality, focus policy, planner fallback order, scene-aware Auto behavior, RAW-only behavior, video behavior, badge labels, explicit mode metadata, Ultra HDR decisions, profile-aware HDR/DRO processing settings, and slow-capture flags.
 
 ## References
 

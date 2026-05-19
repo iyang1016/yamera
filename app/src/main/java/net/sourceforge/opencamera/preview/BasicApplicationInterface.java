@@ -359,6 +359,11 @@ public abstract class BasicApplicationInterface implements ApplicationInterface 
     }
 
     @Override
+    public int getNRBurstMaxImages() {
+        return CameraController.N_IMAGES_NR_DARK_LOW_LIGHT;
+    }
+
+    @Override
     public boolean isCameraExtensionPref() {
         return false;
     }

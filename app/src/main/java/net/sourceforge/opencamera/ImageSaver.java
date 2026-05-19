@@ -1428,6 +1428,16 @@ public class ImageSaver extends Thread {
         return true;
     }
 
+    private void logQualitySaveSummary(final Request request, boolean success, long time_s) {
+        if( MyDebug.LOG ) {
+            Log.d(TAG, "quality save summary: process=" + request.process_type +
+                    " images=" + request.jpeg_images.size() +
+                    " format=" + request.image_format +
+                    " success=" + success +
+                    " total_ms=" + (System.currentTimeMillis() - time_s));
+        }
+    }
+
     /** May be run in saver thread or picture callback thread (depending on whether running in background).
      */
     private boolean saveImageNow(final Request request) {
@@ -1446,6 +1456,17 @@ public class ImageSaver extends Thread {
             // throw runtime exception, as this is a programming error
             throw new RuntimeException();
         }
+        if( MyDebug.LOG ) {
+            Log.d(TAG, "quality save process type: " + request.process_type);
+            Log.d(TAG, "quality save image count: " + request.jpeg_images.size());
+            Log.d(TAG, "quality save image format: " + request.image_format);
+            Log.d(TAG, "quality save jpeg quality: " + request.image_quality);
+            Log.d(TAG, "quality save camera2: " + request.using_camera2);
+            Log.d(TAG, "quality save camera extensions: " + request.using_camera_extensions);
+            Log.d(TAG, "quality save iso: " + request.iso);
+            Log.d(TAG, "quality save exposure time: " + request.exposure_time);
+        }
+        long quality_save_start_time = System.currentTimeMillis();
 
         if( request.preshot_bitmaps != null && !request.preshot_bitmaps.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
             savePreshotBitmaps(request);
@@ -1667,6 +1688,7 @@ public class ImageSaver extends Thread {
                 if( MyDebug.LOG )
                     Log.e(TAG, "failed to load bitmaps");
                 main_activity.savingImage(false);
+                logQualitySaveSummary(request, false, quality_save_start_time);
                 return false;
             }
             if( MyDebug.LOG ) {
@@ -1676,6 +1698,7 @@ public class ImageSaver extends Thread {
             if( !processHDR(bitmaps, request, time_s) ) {
                 main_activity.getPreview().showToast(null, R.string.failed_to_process_hdr);
                 main_activity.savingImage(false);
+                logQualitySaveSummary(request, false, quality_save_start_time);
                 return false;
             }
 
@@ -1808,6 +1831,7 @@ public class ImageSaver extends Thread {
                 if( MyDebug.LOG )
                     Log.e(TAG, "failed to load bitmaps");
                 main_activity.savingImage(false);
+                logQualitySaveSummary(request, false, quality_save_start_time);
                 return false;
             }
             if( MyDebug.LOG ) {
@@ -1836,6 +1860,7 @@ public class ImageSaver extends Thread {
                     bitmaps.clear();
                     System.gc();
                     main_activity.savingImage(false);
+                    logQualitySaveSummary(request, false, quality_save_start_time);
                     return false;
                 }
                 else {
@@ -1868,6 +1893,7 @@ public class ImageSaver extends Thread {
             success = saveImages(request, suffix, false, true, true);
         }
 
+        logQualitySaveSummary(request, success, quality_save_start_time);
         return success;
     }
 

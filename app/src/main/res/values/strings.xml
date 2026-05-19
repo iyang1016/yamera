@@ -185,6 +185,7 @@
     <string name="quality_profile_badge_low_light">LOW</string>
     <string name="quality_profile_badge_fast">FAST</string>
     <string name="quality_profile_badge_content_description">Open quality profile settings</string>
+    <string name="quality_profile_slow_capture_message">%1$s capture: please hold the camera steady</string>
     <string name="preference_raw">RAW</string>
     <string name="preference_location">Store location data (Geotagging)</string>
     <string name="preference_location_summary">Store GPS location data in the photos/videos (for photos, location data can only be stored in JPEG and DNG formats)</string>
@@ -902,7 +903,7 @@
 
     <string name="exposure_compensation_seekbar">Seekbar to change exposure compensation</string>
 
-    <string name="preference_image_format_summary">Select the file format used for saving photos. This affects \"standard\" (not RAW) photos. Only JPEG formats support saving Exif metadata. Ultra HDR not supported for NR, HDR, Pano, X- modes. Note that PNG format is not truly lossless, instead it is converted from a JPEG at 100%% quality.\n%s</string>
+    <string name="preference_image_format_summary">Select the file format used for saving photos. This affects \"standard\" (not RAW) photos. Only JPEG formats support saving Exif metadata. Ultra HDR is used only for pipelines that do not post-process the JPEG or use camera extensions. Note that PNG format is not truly lossless, instead it is converted from a JPEG at 100%% quality.\n%s</string>
 
     <string name="preference_camera_api">Camera API</string>
     <string name="preference_camera_api_summary">Select Camera2 API to enable extra features such as manual modes for exposure, focus, white balance, along with RAW (if supported by the device). Changing the API will cause a restart.\n%s</string>

@@ -4,6 +4,7 @@ import android.media.CamcorderProfile;
 
 import net.sourceforge.opencamera.MainActivity;
 import net.sourceforge.opencamera.MyApplicationInterface;
+import net.sourceforge.opencamera.QualityPipelinePlanner;
 import net.sourceforge.opencamera.cameracontroller.CameraController;
 import net.sourceforge.opencamera.cameracontroller.CameraController2;
 import net.sourceforge.opencamera.HDRProcessor;
@@ -41,6 +42,46 @@ class Log {
 public class UnitTest {
     private static final String TAG = "UnitTest";
 
+    private static QualityPipelinePlanner.Capabilities qualityCapabilities(boolean is_video,
+                                                                           boolean supports_dro,
+                                                                           boolean supports_hdr,
+                                                                           boolean supports_noise_reduction,
+                                                                           boolean supports_extension_auto,
+                                                                           boolean supports_extension_night,
+                                                                           boolean raw_only) {
+        return new QualityPipelinePlanner.Capabilities(
+                is_video,
+                supports_dro,
+                supports_hdr,
+                supports_noise_reduction,
+                supports_extension_auto,
+                supports_extension_night,
+                raw_only
+        );
+    }
+
+    private static QualityPipelinePlanner.Capabilities qualityCapabilitiesWithScene(boolean is_video,
+                                                                                    boolean supports_dro,
+                                                                                    boolean supports_hdr,
+                                                                                    boolean supports_noise_reduction,
+                                                                                    boolean supports_extension_auto,
+                                                                                    boolean supports_extension_night,
+                                                                                    boolean raw_only,
+                                                                                    boolean has_low_light_scene_hint,
+                                                                                    boolean low_light_scene) {
+        return new QualityPipelinePlanner.Capabilities(
+                is_video,
+                supports_dro,
+                supports_hdr,
+                supports_noise_reduction,
+                supports_extension_auto,
+                supports_extension_night,
+                raw_only,
+                has_low_light_scene_hint,
+                low_light_scene
+        );
+    }
+
     @Test
     public void testQualityProfileImageQuality() {
         assertEquals(95, MyApplicationInterface.getSaveImageQualityForProfile(95, "preference_quality_profile_auto"));
@@ -60,6 +101,285 @@ public class UnitTest {
         assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_low_light", "preference_photo_optimise_focus_latency", true));
         assertTrue(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_fast", "preference_photo_optimise_focus_quality", true));
         assertFalse(MyApplicationInterface.optimiseFocusForLatencyForProfile("preference_quality_profile_fast", "preference_photo_optimise_focus_quality", false));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerFastKeepsStandard() {
+        QualityPipelinePlanner.Plan plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_fast",
+                qualityCapabilities(false, true, true, true, true, true, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.Standard, plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, plan.nr_mode);
+        assertFalse(plan.slow_capture_warning);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerLowLightUsesNightExtension() {
+        QualityPipelinePlanner.Plan plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_low_light",
+                qualityCapabilities(false, true, true, true, true, true, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.X_Night, plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_LOW_LIGHT, plan.nr_mode);
+        assertTrue(plan.slow_capture_warning);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerLowLightFallsBackToNoiseReduction() {
+        QualityPipelinePlanner.Plan plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_low_light",
+                qualityCapabilities(false, true, true, true, false, false, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.NoiseReduction, plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_LOW_LIGHT, plan.nr_mode);
+        assertTrue(plan.slow_capture_warning);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerMaxDetailPrefersExtensionThenNoiseReduction() {
+        QualityPipelinePlanner.Plan extension_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_max_detail",
+                qualityCapabilities(false, true, true, true, true, false, false)
+        );
+        QualityPipelinePlanner.Plan nr_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_max_detail",
+                qualityCapabilities(false, true, true, true, false, false, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.X_Auto, extension_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, extension_plan.nr_mode);
+        assertFalse(extension_plan.slow_capture_warning);
+        assertEquals(MyApplicationInterface.PhotoMode.NoiseReduction, nr_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, nr_plan.nr_mode);
+        assertTrue(nr_plan.slow_capture_warning);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerRawOnlyAndVideoStayConservative() {
+        QualityPipelinePlanner.Plan raw_only_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_max_detail",
+                qualityCapabilities(false, true, true, true, true, true, true)
+        );
+        QualityPipelinePlanner.Plan video_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_max_detail",
+                qualityCapabilities(true, true, true, true, true, true, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.Standard, raw_only_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, raw_only_plan.nr_mode);
+        assertEquals(MyApplicationInterface.PhotoMode.Standard, video_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, video_plan.nr_mode);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerAutoUsesLowLightSceneHint() {
+        QualityPipelinePlanner.Plan night_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_auto",
+                qualityCapabilitiesWithScene(false, true, true, true, true, true, false, true, true)
+        );
+        QualityPipelinePlanner.Plan nr_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_auto",
+                qualityCapabilitiesWithScene(false, true, true, true, true, false, false, true, true)
+        );
+        QualityPipelinePlanner.Plan bright_plan = QualityPipelinePlanner.planForStandardMode(
+                "preference_quality_profile_auto",
+                qualityCapabilitiesWithScene(false, true, true, true, true, true, false, true, false)
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.X_Night, night_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_LOW_LIGHT, night_plan.nr_mode);
+        assertTrue(night_plan.slow_capture_warning);
+        assertEquals(MyApplicationInterface.PhotoMode.NoiseReduction, nr_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_LOW_LIGHT, nr_plan.nr_mode);
+        assertTrue(nr_plan.slow_capture_warning);
+        assertEquals(MyApplicationInterface.PhotoMode.X_Auto, bright_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, bright_plan.nr_mode);
+        assertFalse(bright_plan.slow_capture_warning);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerBadgeLabels() {
+        assertEquals("AUTO", QualityPipelinePlanner.getProfileBadgePrefix("preference_quality_profile_auto"));
+        assertEquals("MAX", QualityPipelinePlanner.getProfileBadgePrefix("preference_quality_profile_max_detail"));
+        assertEquals("LOW", QualityPipelinePlanner.getProfileBadgePrefix("preference_quality_profile_low_light"));
+        assertEquals("FAST", QualityPipelinePlanner.getProfileBadgePrefix("preference_quality_profile_fast"));
+        assertEquals("X-AUTO", QualityPipelinePlanner.getPhotoModeBadgeLabel(MyApplicationInterface.PhotoMode.X_Auto));
+        assertEquals("NIGHT", QualityPipelinePlanner.getPhotoModeBadgeLabel(MyApplicationInterface.PhotoMode.X_Night));
+        assertEquals("NR", QualityPipelinePlanner.getPhotoModeBadgeLabel(MyApplicationInterface.PhotoMode.NoiseReduction));
+        assertEquals("STD", QualityPipelinePlanner.getPhotoModeBadgeLabel(MyApplicationInterface.PhotoMode.Standard));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerExplicitModeMetadata() {
+        QualityPipelinePlanner.Plan nr_plan = QualityPipelinePlanner.planForExplicitMode(
+                MyApplicationInterface.PhotoMode.NoiseReduction,
+                QualityPipelinePlanner.NR_MODE_LOW_LIGHT
+        );
+        QualityPipelinePlanner.Plan standard_plan = QualityPipelinePlanner.planForExplicitMode(
+                MyApplicationInterface.PhotoMode.Standard,
+                QualityPipelinePlanner.NR_MODE_LOW_LIGHT
+        );
+
+        assertEquals(MyApplicationInterface.PhotoMode.NoiseReduction, nr_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_LOW_LIGHT, nr_plan.nr_mode);
+        assertTrue(nr_plan.slow_capture_warning);
+        assertEquals("LOW NR", QualityPipelinePlanner.getPlanBadgeText("preference_quality_profile_low_light", nr_plan));
+        assertEquals(MyApplicationInterface.PhotoMode.Standard, standard_plan.photo_mode);
+        assertEquals(QualityPipelinePlanner.NR_MODE_NORMAL, standard_plan.nr_mode);
+        assertFalse(standard_plan.slow_capture_warning);
+        assertEquals("FAST STD", QualityPipelinePlanner.getPlanBadgeText("preference_quality_profile_fast", standard_plan));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerSlowCaptureModeFlags() {
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.HDR));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.ExpoBracketing));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.FocusBracketing));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.NoiseReduction));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.Panorama));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.X_HDR));
+        assertTrue(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.X_Night));
+        assertFalse(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.Standard));
+        assertFalse(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.DRO));
+        assertFalse(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.FastBurst));
+        assertFalse(QualityPipelinePlanner.isSlowCaptureMode(MyApplicationInterface.PhotoMode.X_Auto));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerUltraHDRDecision() {
+        assertTrue(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.Standard,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg",
+                MyApplicationInterface.PhotoMode.Standard,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.Standard,
+                true,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.DRO,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.HDR,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.NoiseReduction,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.Panorama,
+                false,
+                false
+        ));
+        assertFalse(QualityPipelinePlanner.shouldUseUltraHDR(
+                "preference_image_format_jpeg_r",
+                MyApplicationInterface.PhotoMode.X_Auto,
+                false,
+                true
+        ));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerUltraHDRBadgeText() {
+        QualityPipelinePlanner.Plan plan = QualityPipelinePlanner.planForExplicitMode(
+                MyApplicationInterface.PhotoMode.Standard,
+                QualityPipelinePlanner.NR_MODE_NORMAL
+        );
+
+        assertEquals("MAX UHDR", QualityPipelinePlanner.getPlanBadgeText("preference_quality_profile_max_detail", plan, true));
+        assertEquals("MAX STD", QualityPipelinePlanner.getPlanBadgeText("preference_quality_profile_max_detail", plan, false));
+    }
+
+    @Test
+    public void testQualityPipelinePlannerHDRProcessingProfiles() {
+        QualityPipelinePlanner.HDRProcessingSettings max_detail = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_max_detail",
+                "preference_hdr_tonemapping_default",
+                "preference_hdr_contrast_enhancement_smart",
+                100,
+                1000000000L/120
+        );
+        QualityPipelinePlanner.HDRProcessingSettings low_light = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_low_light",
+                "preference_hdr_tonemapping_aces",
+                "preference_hdr_contrast_enhancement_always",
+                1600,
+                1000000000L/10
+        );
+        QualityPipelinePlanner.HDRProcessingSettings fast = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_fast",
+                "preference_hdr_tonemapping_aces",
+                "preference_hdr_contrast_enhancement_always",
+                100,
+                1000000000L/120
+        );
+
+        assertEquals(HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_ACES, max_detail.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_always", max_detail.contrast_enhancement);
+        assertEquals("max_detail_aces_contrast", max_detail.reason);
+        assertEquals(HDRProcessor.default_tonemapping_algorithm_c, low_light.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_off", low_light.contrast_enhancement);
+        assertEquals("low_light_noise_control", low_light.reason);
+        assertEquals(HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_CLAMP, fast.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_off", fast.contrast_enhancement);
+        assertEquals("fast_minimal_processing", fast.reason);
+    }
+
+    @Test
+    public void testQualityPipelinePlannerHDRProcessingAutoAndUserPrefs() {
+        QualityPipelinePlanner.HDRProcessingSettings auto_low_light = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_auto",
+                "preference_hdr_tonemapping_aces",
+                "preference_hdr_contrast_enhancement_always",
+                1600,
+                1000000000L/10
+        );
+        QualityPipelinePlanner.HDRProcessingSettings auto_normal = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_auto",
+                "preference_hdr_tonemapping_exponential",
+                "preference_hdr_contrast_enhancement_always",
+                100,
+                1000000000L/120
+        );
+        QualityPipelinePlanner.HDRProcessingSettings auto_invalid = QualityPipelinePlanner.planHDRProcessing(
+                "preference_quality_profile_auto",
+                "invalid_tonemapping",
+                "invalid_contrast",
+                100,
+                1000000000L/120
+        );
+
+        assertEquals(HDRProcessor.default_tonemapping_algorithm_c, auto_low_light.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_off", auto_low_light.contrast_enhancement);
+        assertEquals("auto_low_light_noise_control", auto_low_light.reason);
+        assertEquals(HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_EXPONENTIAL, auto_normal.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_always", auto_normal.contrast_enhancement);
+        assertEquals("user_processing_preferences", auto_normal.reason);
+        assertEquals(HDRProcessor.default_tonemapping_algorithm_c, auto_invalid.tonemapping_algorithm);
+        assertEquals("preference_hdr_contrast_enhancement_smart", auto_invalid.contrast_enhancement);
+        assertEquals("user_processing_preferences", auto_invalid.reason);
     }
 
     @Test

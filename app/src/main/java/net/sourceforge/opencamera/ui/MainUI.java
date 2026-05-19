@@ -1248,24 +1248,9 @@ public class MainUI {
             return;
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_max_detail");
-        int text_id;
-        switch( quality_profile ) {
-            case "preference_quality_profile_max_detail":
-                text_id = R.string.quality_profile_badge_max_detail;
-                break;
-            case "preference_quality_profile_low_light":
-                text_id = R.string.quality_profile_badge_low_light;
-                break;
-            case "preference_quality_profile_fast":
-                text_id = R.string.quality_profile_badge_fast;
-                break;
-            default:
-                badge.setVisibility(View.GONE);
-                return;
-        }
-        badge.setText(text_id);
+        String badge_text = main_activity.getApplicationInterface().getQualityPipelineBadgeText();
+        badge.setText(badge_text);
+        badge.setContentDescription(main_activity.getResources().getString(R.string.quality_profile_badge_content_description) + ": " + badge_text);
         badge.setVisibility(View.VISIBLE);
     }
 

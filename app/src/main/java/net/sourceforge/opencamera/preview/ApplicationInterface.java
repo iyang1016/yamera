@@ -177,6 +177,7 @@ public interface ApplicationInterface {
         NRMODE_LOW_LIGHT
     }
     NRModePref getNRModePref(); // only relevant if getBurstForNoiseReduction() returns true; if this changes without reopening the preview's camera, call Preview.setupBurstMode()
+    int getNRBurstMaxImages(); // only relevant if getBurstForNoiseReduction() returns true; caps scene-selected NR burst image count.
     boolean isCameraExtensionPref(); // whether to use camera vendor extension (see https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics )
     @RequiresApi(api = Build.VERSION_CODES.S)
     int getCameraExtensionPref(); // if isCameraExtensionPref() returns true, the camera extension mode to use

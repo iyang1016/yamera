@@ -24,8 +24,10 @@
         android:id="@+id/mode_carousel"
         android:layout_width="@dimen/mode_carousel_width"
         android:layout_height="@dimen/mode_carousel_height"
+        android:background="@drawable/mode_carousel_background"
         android:gravity="center"
         android:orientation="horizontal"
+        android:padding="2dp"
         android:visibility="invisible"
         >
 
@@ -41,7 +43,7 @@
             android:textSize="13sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.08"
+            android:letterSpacing="0"
             android:onClick="clickedModeVideo"
             android:clickable="true"
             />
@@ -58,7 +60,7 @@
             android:textSize="13sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.08"
+            android:letterSpacing="0"
             android:onClick="clickedModePhoto"
             android:clickable="true"
             />
@@ -70,12 +72,18 @@
         android:layout_width="@dimen/quality_profile_badge_width"
         android:layout_height="@dimen/mode_carousel_height"
         android:gravity="center"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:contentDescription="@string/quality_profile_badge_content_description"
         android:onClick="clickedQualityProfileBadge"
         android:clickable="true"
+        android:background="@drawable/quality_badge_background"
         android:textColor="@color/mode_text_active"
-        android:textSize="11sp"
+        android:textSize="10sp"
         android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:includeFontPadding="false"
+        android:maxLines="1"
         android:visibility="gone"
         />
     

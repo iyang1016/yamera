@@ -1626,6 +1626,12 @@ public class MyApplicationInterface extends BasicApplicationInterface {
     public NRModePref getNRModePref() {
 		/*if( MyDebug.LOG )
 			Log.d(TAG, "nr_mode: " + nr_mode);*/
+        if( isStandardPhotoModePref() ) {
+            QualityPipelinePlanner.Plan quality_plan = getQualityPipelinePlanForStandardMode();
+            if( quality_plan.photo_mode == PhotoMode.NoiseReduction && QualityPipelinePlanner.NR_MODE_LOW_LIGHT.equals(quality_plan.nr_mode) ) {
+                return NRModePref.NRMODE_LOW_LIGHT;
+            }
+        }
         //noinspection SwitchStatementWithTooFewBranches
         switch( nr_mode ) {
             case "preference_nr_mode_low_light":
@@ -1747,6 +1753,84 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         return sharedPreferences.getBoolean(PreferenceKeys.FocusBracketingAddInfinityPreferenceKey, false);
     }
 
+    private boolean isStandardPhotoModePref() {
+        String photo_mode_pref = sharedPreferences.getString(PreferenceKeys.PhotoModePreferenceKey, "preference_photo_mode_std");
+        return photo_mode_pref.equals("preference_photo_mode_std");
+    }
+
+    private String getQualityProfilePref() {
+        return sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_max_detail");
+    }
+
+    private QualityPipelinePlanner.Plan getQualityPipelinePlanForStandardMode() {
+        String quality_profile = getQualityProfilePref();
+        Preview preview = main_activity.getPreview();
+        boolean is_video = preview != null && preview.isVideo();
+        boolean has_preview = preview != null;
+        boolean supports_extension_auto = false;
+        boolean supports_extension_night = false;
+        if( has_preview && !is_video ) {
+            supports_extension_auto = main_activity.supportsCameraExtension(CameraExtensionCharacteristics.EXTENSION_AUTOMATIC);
+            supports_extension_night = main_activity.supportsCameraExtension(CameraExtensionCharacteristics.EXTENSION_NIGHT);
+        }
+        CameraController camera_controller = has_preview ? preview.getCameraController() : null;
+        boolean has_low_light_scene_hint = false;
+        boolean low_light_scene = false;
+        if( camera_controller != null && camera_controller.captureResultHasIso() && camera_controller.captureResultHasExposureTime() ) {
+            int iso = camera_controller.captureResultIso();
+            long exposure_time = camera_controller.captureResultExposureTime();
+            has_low_light_scene_hint = true;
+            low_light_scene = HDRProcessor.sceneIsLowLight(iso, exposure_time);
+        }
+        QualityPipelinePlanner.Capabilities capabilities = new QualityPipelinePlanner.Capabilities(
+                is_video,
+                has_preview && main_activity.supportsDRO(),
+                has_preview && main_activity.supportsHDR(),
+                has_preview && main_activity.supportsNoiseReduction(),
+                supports_extension_auto,
+                supports_extension_night,
+                has_preview && isRawOnly(PhotoMode.Standard),
+                has_low_light_scene_hint,
+                low_light_scene
+        );
+        return QualityPipelinePlanner.planForStandardMode(quality_profile, capabilities);
+    }
+
+    public QualityPipelinePlanner.Plan getQualityPipelinePlan() {
+        if( isStandardPhotoModePref() ) {
+            return getQualityPipelinePlanForStandardMode();
+        }
+        return QualityPipelinePlanner.planForExplicitMode(getPhotoMode(), nr_mode);
+    }
+
+    public String getQualityPipelineBadgeText() {
+        QualityPipelinePlanner.Plan quality_plan = getQualityPipelinePlan();
+        return QualityPipelinePlanner.getPlanBadgeText(getQualityProfilePref(), quality_plan, shouldUseUltraHDR(quality_plan.photo_mode));
+    }
+
+    private boolean shouldShowQualityPipelineSlowWarning(QualityPipelinePlanner.Plan quality_plan) {
+        if( !isStandardPhotoModePref() || !quality_plan.slow_capture_warning ) {
+            return false;
+        }
+        return !(quality_plan.photo_mode == PhotoMode.NoiseReduction && QualityPipelinePlanner.NR_MODE_LOW_LIGHT.equals(quality_plan.nr_mode));
+    }
+
+    private String getQualityPipelineSlowCaptureMessage(QualityPipelinePlanner.Plan quality_plan) {
+        String mode_label = QualityPipelinePlanner.getPhotoModeBadgeLabel(quality_plan.photo_mode);
+        return getContext().getResources().getString(R.string.quality_profile_slow_capture_message, mode_label);
+    }
+
+    private void logQualityPipelinePlan(QualityPipelinePlanner.Plan quality_plan) {
+        if( MyDebug.LOG ) {
+            Log.d(TAG, "quality pipeline profile: " + getQualityProfilePref());
+            Log.d(TAG, "quality pipeline mode: " + quality_plan.photo_mode);
+            Log.d(TAG, "quality pipeline nr mode: " + quality_plan.nr_mode);
+            Log.d(TAG, "quality pipeline reason: " + quality_plan.reason);
+            Log.d(TAG, "quality pipeline slow capture: " + quality_plan.slow_capture_warning);
+            Log.d(TAG, "quality pipeline ultra hdr: " + shouldUseUltraHDR(quality_plan.photo_mode));
+        }
+    }
+
     /** Returns the current photo mode.
      *  Note, this always should return the true photo mode - if we're in video mode and taking a photo snapshot while
      *  video recording, the caller should override. We don't override here, as this preference may be used to affect how
@@ -1792,26 +1876,26 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         boolean x_beauty = photo_mode_pref.equals("preference_photo_mode_x_beauty");
         if( x_beauty && !main_activity.getPreview().isVideo() && main_activity.supportsCameraExtension(CameraExtensionCharacteristics.EXTENSION_BEAUTY) )
             return PhotoMode.X_Beauty;
+        boolean standard = photo_mode_pref.equals("preference_photo_mode_std");
+        if( standard )
+            return getQualityPipelinePlanForStandardMode().photo_mode;
         return PhotoMode.Standard;
     }
 
     @Override
     public boolean getJpegRPref() {
-        if( sharedPreferences.getString(PreferenceKeys.ImageFormatPreferenceKey, "preference_image_format_jpeg").equals("preference_image_format_jpeg_r") ) {
-            if( main_activity.getPreview().isVideo() ) {
-                // don't support JPEG R, either for video recording or video snapshot - problem that video recording fails
-                // if CameraController2 sets "config.setDynamicRangeProfile(DynamicRangeProfiles.HLG10);" for the preview
-                return false;
-            }
-            else {
-                PhotoMode photo_mode = getPhotoMode();
-                if( photo_mode == PhotoMode.NoiseReduction || photo_mode == PhotoMode.HDR || photo_mode == PhotoMode.Panorama )
-                    return false; // not supported for these photo modes
-                // n.b., JPEG R won't be supported by x- extension modes either, although this is automatically handled by Preview
-                return true;
-            }
-        }
-        return false;
+        return shouldUseUltraHDR(getPhotoMode());
+    }
+
+    private boolean shouldUseUltraHDR(PhotoMode photo_mode) {
+        String image_format_pref = sharedPreferences.getString(PreferenceKeys.ImageFormatPreferenceKey, "preference_image_format_jpeg");
+        Preview preview = main_activity.getPreview();
+        boolean is_video = preview != null && preview.isVideo();
+        return QualityPipelinePlanner.shouldUseUltraHDR(image_format_pref, photo_mode, is_video, isCameraExtensionPhotoMode(photo_mode));
+    }
+
+    private static boolean isCameraExtensionPhotoMode(PhotoMode photo_mode) {
+        return photo_mode == PhotoMode.X_Auto || photo_mode == PhotoMode.X_HDR || photo_mode == PhotoMode.X_Night || photo_mode == PhotoMode.X_Bokeh || photo_mode == PhotoMode.X_Beauty;
     }
 
     private ImageSaver.Request.ImageFormat getImageFormatPref() {
@@ -2871,8 +2955,13 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         n_capture_images_raw = 0;
         drawPreview.onCaptureStarted();
 
-        if( getPhotoMode() == PhotoMode.X_Night ) {
+        QualityPipelinePlanner.Plan quality_plan = getQualityPipelinePlan();
+        logQualityPipelinePlan(quality_plan);
+        if( quality_plan.photo_mode == PhotoMode.X_Night ) {
             main_activity.getPreview().showToast(null, R.string.preference_nr_mode_low_light_message, true);
+        }
+        else if( shouldShowQualityPipelineSlowWarning(quality_plan) ) {
+            main_activity.getPreview().showToast(null, getQualityPipelineSlowCaptureMessage(quality_plan), true);
         }
     }
 
@@ -3604,28 +3693,23 @@ public class MyApplicationInterface extends BasicApplicationInterface {
                 processType = ImageSaver.Request.ProcessType.NORMAL;
             boolean force_suffix = forceSuffix(photo_mode);
 
-            HDRProcessor.TonemappingAlgorithm preference_hdr_tonemapping_algorithm = HDRProcessor.default_tonemapping_algorithm_c;
-            {
-                String tonemapping_algorithm_pref = sharedPreferences.getString(PreferenceKeys.HDRTonemappingPreferenceKey, "preference_hdr_tonemapping_default");
-                switch( tonemapping_algorithm_pref ) {
-                    case "preference_hdr_tonemapping_clamp":
-                        preference_hdr_tonemapping_algorithm = HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_CLAMP;
-                        break;
-                    case "preference_hdr_tonemapping_exponential":
-                        preference_hdr_tonemapping_algorithm = HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_EXPONENTIAL;
-                        break;
-                    case "preference_hdr_tonemapping_default": // reinhard
-                        preference_hdr_tonemapping_algorithm = HDRProcessor.default_tonemapping_algorithm_c;
-                        break;
-                    case "preference_hdr_tonemapping_aces":
-                        preference_hdr_tonemapping_algorithm = HDRProcessor.TonemappingAlgorithm.TONEMAPALGORITHM_ACES;
-                        break;
-                    default:
-                        Log.e(TAG, "unhandled case for tonemapping: " + tonemapping_algorithm_pref);
-                        break;
-                }
+            String tonemapping_algorithm_pref = sharedPreferences.getString(PreferenceKeys.HDRTonemappingPreferenceKey, "preference_hdr_tonemapping_default");
+            String contrast_enhancement_pref = sharedPreferences.getString(PreferenceKeys.HDRContrastEnhancementPreferenceKey, "preference_hdr_contrast_enhancement_smart");
+            QualityPipelinePlanner.HDRProcessingSettings hdr_processing_settings = QualityPipelinePlanner.planHDRProcessing(
+                    getQualityProfilePref(),
+                    tonemapping_algorithm_pref,
+                    contrast_enhancement_pref,
+                    iso,
+                    exposure_time
+            );
+            HDRProcessor.TonemappingAlgorithm preference_hdr_tonemapping_algorithm = hdr_processing_settings.tonemapping_algorithm;
+            String preference_hdr_contrast_enhancement = hdr_processing_settings.contrast_enhancement;
+            if( MyDebug.LOG ) {
+                Log.d(TAG, "quality HDR processing profile: " + getQualityProfilePref());
+                Log.d(TAG, "quality HDR processing reason: " + hdr_processing_settings.reason);
+                Log.d(TAG, "quality HDR tonemapping: " + preference_hdr_tonemapping_algorithm);
+                Log.d(TAG, "quality HDR contrast enhancement: " + preference_hdr_contrast_enhancement);
             }
-            String preference_hdr_contrast_enhancement = sharedPreferences.getString(PreferenceKeys.HDRContrastEnhancementPreferenceKey, "preference_hdr_contrast_enhancement_smart");
 
             success = imageSaver.saveImageJpeg(do_in_background, processType,
                     force_suffix,
