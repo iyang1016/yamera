@@ -8,4 +8,13 @@
     android:id="@+id/button"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:minHeight="44dp"
+    android:background="@android:color/transparent"
+    android:textColor="@color/text_primary"
+    android:textSize="14sp"
+    android:fontFamily="sans-serif"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:gravity="center_vertical|start"
+    android:textAllCaps="false"
     />

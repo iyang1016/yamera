@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="seekbar_background">#20000000</color>
-    <color name="icons_background">#20000000</color> <!-- when used as background color for imagebutton, the rgb color seems to be ignored for Android 6 onwards, but still relevant for older versions -->
-    <color name="icons_background_tint">#66000000</color>
-    <color name="controls_panel_background">#D9000000</color>
+    <!-- Legacy compatibility -->
+    <color name="seekbar_background">#00000000</color> <!-- transparent — seekbars float on preview now -->
+    <color name="icons_background">#20000000</color>
+    <color name="icons_background_tint">#40FFFFFF</color> <!-- frosted white glass -->
+
+    <!-- Bottom bar -->
+    <color name="controls_panel_background">#E6000000</color>
+
+    <!-- Mode carousel -->
     <color name="mode_text_active">#FDD663</color>
-    <color name="mode_text_inactive">#CCFFFFFF</color>
+    <color name="mode_text_inactive">#99FFFFFF</color>
+
+    <!-- Shutter -->
     <color name="shutter_icon">#FFFFFFFF</color>
     <color name="shutter_icon_pressed">#FFE8EAED</color>
     <color name="shutter_icon_video_recording">#F44336</color>
+
+    <!-- Premium Design System -->
+    <color name="surface_dark">#0F0F0F</color>
+    <color name="surface_card">#1A1A1A</color>
+    <color name="accent_primary">#FDD663</color>
+    <color name="accent_secondary">#A8C7FA</color>
+    <color name="text_primary">#F0F0F0</color>
+    <color name="text_secondary">#99FFFFFF</color>
+    <color name="divider">#1AFFFFFF</color>
 </resources>

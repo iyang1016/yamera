@@ -5,9 +5,10 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- used for the on-screen icons, e.g., Settings etc -->
-	<dimen name="onscreen_button_size">60dp</dimen>
+	<dimen name="onscreen_button_size">56dp</dimen>
     <dimen name="controls_panel_size">168dp</dimen>
-    <dimen name="mode_carousel_width">184dp</dimen>
+    <dimen name="mode_carousel_width">200dp</dimen>
     <dimen name="mode_carousel_height">40dp</dimen>
     <dimen name="quality_profile_badge_width">48dp</dimen>
+    <dimen name="gallery_corner_radius">6dp</dimen>
 </resources>

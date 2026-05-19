@@ -439,7 +439,8 @@ public class MainUI {
             View previous_view = view;
 
             List<View> buttons_permanent = new ArrayList<>();
-            if( ui_placement == UIPlacement.UIPLACEMENT_TOP ) {
+            // LMC: Gallery is permanently placed in the bottom bar, never in the top panel
+            /*if( ui_placement == UIPlacement.UIPLACEMENT_TOP ) {
                 // not part of the icon panel in TOP mode
                 view = main_activity.findViewById(R.id.gallery);
                 layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -454,7 +455,7 @@ public class MainUI {
                 setMarginsForSystemUI(layoutParams, 0, gallery_top_gap, gallery_navigation_gap, 0);
                 view.setLayoutParams(layoutParams);
                 setViewRotation(view, ui_rotation);
-            }
+            }*/
             else {
                 // LMC: Gallery is placed in the bottom bar, not on the top icon panel
                 // buttons_permanent.add(main_activity.findViewById(R.id.gallery));
@@ -643,10 +644,17 @@ public class MainUI {
             galleryParams.addRule(below, R.id.take_photo);
             galleryParams.addRule(left_of, 0);
             galleryParams.addRule(right_of, 0);
-            galleryParams.addRule(align_left, 0);
-            galleryParams.addRule(align_right, 0);
-            galleryParams.addRule(align_top, R.id.take_photo);
-            galleryParams.addRule(align_bottom, R.id.take_photo);
+            if (system_orientation_portrait) {
+                galleryParams.addRule(align_left, R.id.take_photo);
+                galleryParams.addRule(align_right, R.id.take_photo);
+                galleryParams.addRule(align_top, 0);
+                galleryParams.addRule(align_bottom, 0);
+            } else {
+                galleryParams.addRule(align_top, R.id.take_photo);
+                galleryParams.addRule(align_bottom, R.id.take_photo);
+                galleryParams.addRule(align_left, 0);
+                galleryParams.addRule(align_right, 0);
+            }
             if(system_orientation_portrait) {
                 galleryParams.setMargins(0, 0, (int)(40 * scale), 0);
             } else {
@@ -667,10 +675,17 @@ public class MainUI {
             layoutParams.addRule(below, 0);
             layoutParams.addRule(left_of, 0);
             layoutParams.addRule(right_of, 0);
-            layoutParams.addRule(align_left, 0);
-            layoutParams.addRule(align_right, 0);
-            layoutParams.addRule(align_top, R.id.take_photo);
-            layoutParams.addRule(align_bottom, R.id.take_photo);
+            if (system_orientation_portrait) {
+                layoutParams.addRule(align_left, R.id.take_photo);
+                layoutParams.addRule(align_right, R.id.take_photo);
+                layoutParams.addRule(align_top, 0);
+                layoutParams.addRule(align_bottom, 0);
+            } else {
+                layoutParams.addRule(align_top, R.id.take_photo);
+                layoutParams.addRule(align_bottom, R.id.take_photo);
+                layoutParams.addRule(align_left, 0);
+                layoutParams.addRule(align_right, 0);
+            }
             if(system_orientation_portrait) {
                 layoutParams.setMargins((int)(40 * scale), 0, 0, 0);
             } else {
@@ -1217,6 +1232,10 @@ public class MainUI {
             photo_mode.setEnabled(true);
             video_mode.setTypeface(null, is_video ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
             photo_mode.setTypeface(null, is_video ? android.graphics.Typeface.NORMAL : android.graphics.Typeface.BOLD);
+
+            // LMC: Smooth scale transition on active mode selection
+            video_mode.animate().scaleX(is_video ? 1.15f : 1.0f).scaleY(is_video ? 1.15f : 1.0f).setDuration(200).start();
+            photo_mode.animate().scaleX(is_video ? 1.0f : 1.15f).scaleY(is_video ? 1.0f : 1.15f).setDuration(200).start();
             updateQualityProfileBadge();
         }
     }
@@ -1230,7 +1249,7 @@ public class MainUI {
         }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_max_detail");
         int text_id;
         switch( quality_profile ) {
             case "preference_quality_profile_max_detail":
@@ -2796,9 +2815,9 @@ public class MainUI {
         final long time_s = System.currentTimeMillis();
 
         {
-            // prevent popup being transparent
-            popup_container.setBackgroundColor(Color.BLACK);
-            popup_container.setAlpha(0.9f);
+            // LMC Premium Matte Card Background
+            popup_container.setBackgroundResource(R.drawable.popup_background);
+            popup_container.setAlpha(1.0f);
         }
 
         if( popup_view == null ) {

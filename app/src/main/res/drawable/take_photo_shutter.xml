@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/shutter_icon"/>
-    <stroke
-        android:width="6dp"
-        android:color="#33000000"
-        />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer Ring -->
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="4dp"
+                android:color="@color/shutter_icon" />
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+    <!-- Inner Solid Circle -->
+    <item
+        android:bottom="8dp"
+        android:left="8dp"
+        android:right="8dp"
+        android:top="8dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/shutter_icon"/>
+        </shape>
+    </item>
+</layer-list>

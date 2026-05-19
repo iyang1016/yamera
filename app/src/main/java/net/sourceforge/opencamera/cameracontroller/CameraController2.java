@@ -379,7 +379,7 @@ public class CameraController2 extends CameraController {
         // keys that we need to store, to pass to the stillBuilder, but doesn't need to be passed to previewBuilder (should set sensible defaults)
         private int rotation;
         private Location location;
-        private byte jpeg_quality = 90;
+        private byte jpeg_quality = 100;
 
         // keys that we have passed to the previewBuilder, that we need to store to also pass to the stillBuilder (should set sensible defaults, or use a has_ boolean if we don't want to set a default)
         private int scene_mode = CameraMetadata.CONTROL_SCENE_MODE_DISABLED;
@@ -390,11 +390,11 @@ public class CameraController2 extends CameraController {
         private boolean has_antibanding;
         private int antibanding = CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO;
         private boolean has_edge_mode;
-        private int edge_mode = CameraMetadata.EDGE_MODE_FAST;
+        private int edge_mode = CameraMetadata.EDGE_MODE_HIGH_QUALITY;
         private boolean has_default_edge_mode;
         private Integer default_edge_mode;
         private boolean has_noise_reduction_mode;
-        private int noise_reduction_mode = CameraMetadata.NOISE_REDUCTION_MODE_FAST;
+        private int noise_reduction_mode = CameraMetadata.NOISE_REDUCTION_MODE_HIGH_QUALITY;
         private boolean has_default_noise_reduction_mode;
         private Integer default_noise_reduction_mode;
         private int white_balance_temperature = 5000; // used for white_balance == CONTROL_AWB_MODE_OFF

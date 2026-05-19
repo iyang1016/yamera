@@ -594,16 +594,12 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
             }
         });
 
-        // LMC: Add double tap listener to the controls panel to load XML configurations
+        // LMC: Add double tap listener to the controls panel to load XML configurations via LMC dialog
         View controlsPanel = findViewById(R.id.controls_panel);
         final GestureDetector controlsPanelGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                // Open File Picker for XML
-                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
-                intent.setType("text/xml");
-                intent.addCategory(android.content.Intent.CATEGORY_OPENABLE);
-                startActivityForResult(android.content.Intent.createChooser(intent, "Select LMC Config (.xml)"), 9999);
+                showLmcConfigDialog();
                 return true;
             }
         });
@@ -4685,7 +4681,7 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
 	    /*if( MyDebug.LOG )
 			Log.d(TAG, "padding: " + bottom);*/
         galleryButton.setImageBitmap(null);
-        galleryButton.setImageResource(R.drawable.ic_yamera_gallery_24);
+        galleryButton.setImageResource(R.drawable.baseline_photo_library_white_48);
         // workaround for setImageResource also resetting padding, Android bug
         galleryButton.setPadding(left, top, right, bottom);
         gallery_bitmap = null;
@@ -5636,6 +5632,81 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         //getWindow().setLayout(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
         setWindowFlagsForSettings();
         showAlert(alertDialog.create());
+    }
+
+    /**
+     * Show premium LMC custom dialog listing XML configurations found locally.
+     */
+    public void showLmcConfigDialog() {
+        final java.util.List<java.io.File> configs = LmcConfigManager.getLocalConfigs(this);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(new android.view.ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert));
+        
+        android.widget.TextView titleView = new android.widget.TextView(this);
+        titleView.setText("LMC CONFIGURATIONS");
+        titleView.setTextSize(18);
+        titleView.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleView.setTextColor(getResources().getColor(R.color.mode_text_active));
+        titleView.setPadding(48, 48, 48, 24);
+        builder.setCustomTitle(titleView);
+        
+        if (configs.isEmpty()) {
+            android.widget.TextView emptyView = new android.widget.TextView(this);
+            String msg = "No config files (.xml) found.\n\n" +
+                         "Put your LMC configurations inside:\n" +
+                         "Android/data/net.sourceforge.opencamera/files/configs/\n" +
+                         "or create an LMC8.4 folder in your main storage.";
+            emptyView.setText(msg);
+            emptyView.setTextSize(14);
+            emptyView.setPadding(48, 24, 48, 48);
+            emptyView.setTextColor(android.graphics.Color.WHITE);
+            builder.setView(emptyView);
+        } else {
+            String[] configNames = new String[configs.size()];
+            for (int i = 0; i < configs.size(); i++) {
+                configNames[i] = configs.get(i).getName();
+            }
+            
+            builder.setItems(configNames, new android.content.DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(android.content.DialogInterface dialog, int which) {
+                    java.io.File selected = configs.get(which);
+                    try {
+                        java.io.FileInputStream fis = new java.io.FileInputStream(selected);
+                        boolean success = LmcConfigManager.importConfig(MainActivity.this, fis, selected.getName());
+                        fis.close();
+                        if (success) {
+                            MainActivity.this.recreate();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        preview.showToast(null, "Could not load XML Config");
+                    }
+                }
+            });
+        }
+        
+        builder.setPositiveButton("System Picker", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(android.content.DialogInterface dialog, int which) {
+                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                intent.setType("text/xml");
+                intent.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+                startActivityForResult(android.content.Intent.createChooser(intent, "Select LMC Config (.xml)"), 9999);
+            }
+        });
+        
+        builder.setNegativeButton("Cancel", null);
+        
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.popup_background);
+        }
+        
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.mode_text_active));
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.GRAY);
     }
 
     /** Clears the non-SAF folder history.

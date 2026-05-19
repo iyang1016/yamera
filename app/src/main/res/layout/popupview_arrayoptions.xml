@@ -6,13 +6,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
     <Button
         android:id="@+id/button_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:background="@android:color/transparent"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textAllCaps="false"
         />
     <TextView
         android:id="@+id/text_view"
@@ -20,11 +29,19 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:gravity="center"
-        android:textColor="#ffffffff"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
         />
     <Button
         android:id="@+id/button_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:background="@android:color/transparent"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textAllCaps="false"
         />
 </LinearLayout>

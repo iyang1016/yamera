@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <size android:width="48dp" android:height="48dp"
-        />
-    <solid android:color="@color/shutter_icon_video_recording"/>
-    <stroke
-        android:width="14dp"
-        android:color="#FFFFFF"
-        />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer White Ring -->
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="4dp"
+                android:color="@color/shutter_icon" />
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+    <!-- Inner Red Circle (Slightly smaller inset for tactile pressed effect) -->
+    <item
+        android:bottom="14dp"
+        android:left="14dp"
+        android:right="14dp"
+        android:top="14dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/shutter_icon_video_recording"/>
+        </shape>
+    </item>
+</layer-list>

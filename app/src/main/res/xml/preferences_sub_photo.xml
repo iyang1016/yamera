@@ -32,7 +32,7 @@
         android:key="preference_quality"
         android:title="@string/preference_quality"
         android:summary="@string/preference_quality_summary"
-        android:defaultValue="95"
+        android:defaultValue="100"
         />
 
     <ListPreference
@@ -41,7 +41,7 @@
         android:summary="@string/preference_quality_profile_summary"
         android:entries="@array/preference_quality_profile_entries"
         android:entryValues="@array/preference_quality_profile_values"
-        android:defaultValue="preference_quality_profile_auto"
+        android:defaultValue="preference_quality_profile_max_detail"
         />
 
     <ListPreference

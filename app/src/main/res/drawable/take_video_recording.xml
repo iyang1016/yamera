@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer White Ring -->
     <item>
-        <shape
-            android:shape="oval">
-            <size android:width="48dp" android:height="48dp"/>
-            <solid android:color="#FFFFFF"/>
+        <shape android:shape="oval">
+            <stroke
+                android:width="4dp"
+                android:color="@color/shutter_icon" />
+            <solid android:color="@android:color/transparent"/>
         </shape>
     </item>
-    <item android:left="16dp" android:top="16dp" android:right="16dp" android:bottom="16dp">
-        <shape
-            android:shape="rectangle">
+    <!-- Inner Red Rounded-Square Stop Icon -->
+    <item
+        android:bottom="22dp"
+        android:left="22dp"
+        android:right="22dp"
+        android:top="22dp">
+        <shape android:shape="rectangle">
             <solid android:color="@color/shutter_icon_video_recording"/>
-            <corners android:radius="3dp"/>
+            <corners android:radius="4dp"/>
         </shape>
     </item>
 </layer-list>

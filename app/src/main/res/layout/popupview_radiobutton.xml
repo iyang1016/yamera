@@ -8,4 +8,9 @@
     android:id="@+id/popupview_radiobutton"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:minHeight="44dp"
+    android:textColor="@color/text_primary"
+    android:textSize="14sp"
+    android:fontFamily="sans-serif"
+    android:padding="8dp"
     />

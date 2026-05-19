@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * LMC-style XML Configuration Manager for Open Camera.
@@ -101,5 +103,46 @@ public class LmcConfigManager {
             Toast.makeText(context, "Error reading XML config.", Toast.LENGTH_SHORT).show();
             return false;
         }
+    }
+
+    /**
+     * Scans local directories for LMC XML configurations.
+     * Searches standard Scoped-Storage app directory 'configs' and public '/sdcard/LMC8.4/'.
+     */
+    public static List<File> getLocalConfigs(Context context) {
+        List<File> configs = new ArrayList<>();
+        
+        // 1. Scan app-private external files configs folder (no permission required)
+        File privateFolder = context.getExternalFilesDir("configs");
+        if (privateFolder != null) {
+            if (!privateFolder.exists()) {
+                privateFolder.mkdirs();
+            }
+            File[] files = privateFolder.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isFile() && f.getName().endsWith(".xml")) {
+                        configs.add(f);
+                    }
+                }
+            }
+        }
+        
+        // 2. Scan public /sdcard/LMC8.4/ folder
+        try {
+            File publicFolder = new File(android.os.Environment.getExternalStorageDirectory(), "LMC8.4");
+            if (publicFolder.exists() && publicFolder.isDirectory()) {
+                File[] files = publicFolder.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        if (f.isFile() && f.getName().endsWith(".xml")) {
+                            configs.add(f);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        
+        return configs;
     }
 }

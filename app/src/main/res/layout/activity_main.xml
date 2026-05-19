@@ -16,7 +16,7 @@
         android:id="@+id/controls_panel"
         android:layout_width="match_parent"
         android:layout_height="@dimen/controls_panel_size"
-        android:background="@color/controls_panel_background"
+        android:background="@drawable/bottom_gradient"
         android:visibility="invisible"
         />
 
@@ -38,8 +38,10 @@
             android:text="@string/video"
             android:textAllCaps="true"
             android:textColor="@color/mode_text_inactive"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.08"
             android:onClick="clickedModeVideo"
             android:clickable="true"
             />
@@ -53,8 +55,10 @@
             android:text="@string/photo"
             android:textAllCaps="true"
             android:textColor="@color/mode_text_active"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.08"
             android:onClick="clickedModePhoto"
             android:clickable="true"
             />
@@ -185,7 +189,7 @@
         android:contentDescription="@string/zoom"
         android:layout_width="150dp"
         android:layout_height="50dp"
-        android:background="@color/seekbar_background"
+        android:background="@android:color/transparent"
         />
 
     <!-- n.b., layout_marginLeft set programmatically in DrawPreview -->
@@ -199,7 +203,7 @@
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
         android:visibility="gone"
-        android:background="@color/seekbar_background"
+        android:background="@android:color/transparent"
         />
 
     <!-- n.b., layout_marginLeft set programmatically in DrawPreview -->
@@ -231,15 +235,14 @@
         -->
     <ImageButton
         android:id="@+id/gallery"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:padding="0dp"
-        android:scaleType="fitCenter"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="2dp"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/gallery"
-        app:srcCompat="@drawable/ic_yamera_gallery_24"
-        android:background="#00000000"
-        android:backgroundTint="@color/icons_background_tint"
-        android:backgroundTintMode="src_in"
+        app:srcCompat="@drawable/baseline_photo_library_white_48"
+        android:background="@drawable/circle_background"
+        android:clipToOutline="true"
         android:onClick="clickedGallery"
         />
 
@@ -250,7 +253,7 @@
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/action_settings"
-        app:srcCompat="@drawable/ic_yamera_settings_24"
+        app:srcCompat="@drawable/settings"
         android:background="@drawable/control_button_background"
         android:backgroundTint="@color/icons_background_tint"
         android:backgroundTintMode="src_in"
@@ -264,7 +267,7 @@
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/action_popup"
-        app:srcCompat="@drawable/ic_yamera_tune_24"
+        app:srcCompat="@drawable/ic_more_horiz_white_48dp"
         android:background="@drawable/control_button_background"
         android:backgroundTint="@color/icons_background_tint"
         android:backgroundTintMode="src_in"
@@ -677,6 +680,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fadeScrollbars="false"
+        android:padding="12dp"
+        android:clipToPadding="false"
         />
     
     <ScrollView

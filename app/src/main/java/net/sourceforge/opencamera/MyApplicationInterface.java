@@ -661,7 +661,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
     private int getSaveImageQualityPref() {
         if( MyDebug.LOG )
             Log.d(TAG, "getSaveImageQualityPref");
-        String image_quality_s = sharedPreferences.getString(PreferenceKeys.QualityPreferenceKey, "95");
+        String image_quality_s = sharedPreferences.getString(PreferenceKeys.QualityPreferenceKey, "100");
         int image_quality;
         try {
             image_quality = Integer.parseInt(image_quality_s);
@@ -669,9 +669,9 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         catch(NumberFormatException exception) {
             if( MyDebug.LOG )
                 Log.e(TAG, "image_quality_s invalid format: " + image_quality_s);
-            image_quality = 95;
+            image_quality = 100;
         }
-        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_max_detail");
         image_quality = getSaveImageQualityForProfile(image_quality, quality_profile);
         if( isRawOnly() ) {
             // if raw only mode, we can set a lower quality for the JPEG, as it isn't going to be saved - only used for
@@ -1944,7 +1944,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
 
     @Override
     public boolean optimiseFocusForLatency() {
-        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_auto");
+        String quality_profile = sharedPreferences.getString(PreferenceKeys.QualityProfilePreferenceKey, "preference_quality_profile_max_detail");
         String pref = sharedPreferences.getString(PreferenceKeys.OptimiseFocusPreferenceKey, "preference_photo_optimise_focus_latency");
         return optimiseFocusForLatencyForProfile(quality_profile, pref, main_activity.supportsOptimiseFocusLatency());
     }

@@ -1548,6 +1548,23 @@ public class PopupView extends LinearLayout {
 
     static void setButtonSelected(View view, boolean selected) {
         view.setAlpha(selected ? ALPHA_BUTTON_SELECTED : ALPHA_BUTTON);
+        if (selected) {
+            view.setBackgroundResource(R.drawable.popup_button_selected);
+            if (view instanceof android.widget.Button) {
+                ((android.widget.Button) view).setTextColor(android.graphics.Color.parseColor("#111111"));
+                ((android.widget.Button) view).setTypeface(null, android.graphics.Typeface.BOLD);
+            } else if (view instanceof android.widget.ImageButton) {
+                ((android.widget.ImageButton) view).setColorFilter(android.graphics.Color.parseColor("#111111"));
+            }
+        } else {
+            view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            if (view instanceof android.widget.Button) {
+                ((android.widget.Button) view).setTextColor(android.graphics.Color.WHITE);
+                ((android.widget.Button) view).setTypeface(null, android.graphics.Typeface.NORMAL);
+            } else if (view instanceof android.widget.ImageButton) {
+                ((android.widget.ImageButton) view).clearColorFilter();
+            }
+        }
     }
 
     private void addTitleToPopup(final String title) {
